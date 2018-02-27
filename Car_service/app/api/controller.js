@@ -66,7 +66,7 @@ router.get('/car/:id', function (req, res, next) {
       if (err.kind == "ObjectID") {
         return res.status(400).send(responseTemplate('Error', 'Bad request: Invalid ID'));
       } else {
-        return res.status(500).send(responseTemplate('Error','Sorry DB doesn\'t work now, please try again later'));
+        return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
       }
     } else {
       let response = responseTemplate('Ok', car);
@@ -75,42 +75,15 @@ router.get('/car/:id', function (req, res, next) {
   });
 });
 
-// router.get('/ids', function(req, res, next){
-//   let ids = String(req.params.ids);
-//   ids.replace('-',',');
-//   const arr = Array.from(ids);
-//   catalog.getCars(arr, function(err ,result){
-//     if (err){
-//       res.status(400).send({status:'Error', message : err});
-//     } else {
-//       res.status(200).send(result);
-//     }
-//   });
-// });
-
-/*
-router.get('/generate_random_cars', function (req, res, next) {
-  const count = req.query.count ? req.query.count : 100;
-    for (let I = 0; I < count; I++){
-      let car = new catalog({
-        Manufacturer  : 'Generate random car ' + I.toString(),
-        Model         : 'Model ' + I.toString(),
-        Type          : "Type" + (I%5).toString(),
-        Doors         : (I % 9)+1,
-        Person        : 1+I,
-        Loactaion     : {
-          City    : 'Moscow',
-          Street  : I.toString() +'Советский переулок',
-          House   : (100 - I)
-        },
-        Cost          : (I + 0.1)
-      });
-      catalog.saveNewCar(car, function(err, result){
-        if (err)
-          return next(err);
-        else 
-          console.log("Save new car " + I);
-      });
+//  create new car
+router.post('/newCar', function (req, res, next) {
+  const carInfo = req.body;
+  return catalog.createCar(carInfo, function (err, car) {
+    if (err) {
+      return res.status(400).send(responseTemplate('Error', err));
     }
-  res.status(200).send('Random ' + count + 'car');
-});*/
+    return res.status(200).send(responseTemplate('Ok', car));
+  });
+});
+
+//  update car
