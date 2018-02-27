@@ -21,11 +21,11 @@ router.get('/', function (req, res, next) {
   let count = Number(req.query.count);
   return catalog.getCars(page, count, function (err, cars) {
     if (err) {
-      return res.status(400).send(responseTemplate('Error', err));
+      return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
     }
     return catalog.getCount(function (err, countRecord) {
       if (err) {
-        return res.status(500).send({ status: 'Error', message: 'undefined count elem', service: scope });
+        return res.status(500).send(responseTemplate('Error', 'Undefined count elements'));
       }
       const data = {
         cars: result,
@@ -49,33 +49,29 @@ router.get('/list', function (req, res, next) {
     list = list.split(',');
     return catalog.getList(list, function (err, cars) {
       if (err) {
-        
+        return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
       }
+      let response = responseTemplate('Ok', cars);
     });
   } else {
     return res.status(400).send(responseTemplate('Error', 'ids is not defined'));
   }
 });
 
-
 // get car
-router.get('/:id', function (req, res, next) {
-  return passport.checkServiceAuthorization(req, res, function (scope) {
-    const id = req.params.id;
-    return catalog.getCar(id, function (err, result) {
-      if (err) {
-        if (err.kind == "ObjectID")
-          return res.status(400).send({ status: 'Error', message: 'Bad request: Invalid ID', service: scope });
-        else
-          return res.status(404).send({ status: 'Error', message: 'Car not found', service: scope });
+router.get('/car/:id', function (req, res, next) {
+  const id = req.params.id;
+  return catalog.getCar(id, function (err, car) {
+    if (err) {
+      if (err.kind == "ObjectID") {
+        return res.status(400).send(responseTemplate('Error', 'Bad request: Invalid ID'));
       } else {
-        const data = {
-          content: result,
-          service: scope
-        }
-        return res.status(200).send(data);
+        return res.status(500).send(responseTemplate('Error','Sorry DB doesn\'t work now, please try again later'));
       }
-    });
+    } else {
+      let response = responseTemplate('Ok', car);
+      return res.status(200).send(response);
+    }
   });
 });
 
