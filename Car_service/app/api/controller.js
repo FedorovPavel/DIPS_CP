@@ -106,3 +106,30 @@ router.put('/update/:id', function (req, res, next) {
     return res.status(202).send(responseTemplate('Ok', car));
   });
 });
+
+//  update rent date
+router.put('/car/:id/rent', function (req, res, next) {
+  const id = req.params.id;
+  const uid = req.body.uid;
+  if (!uid || uid == undefined) {
+    return res.status(400).send(responseTemplate('Error', 'Bad request: userId is undefined'));
+  }
+  const from = req.body.rentDataFrom;
+  const to = req.body.rentDataTo;
+  if (!from || !to || from == undefined || to == undefined) {
+    return res.status(400).send(responseTemplate('Error', 'Bad request: rent data is undefined'));
+  }
+  const updateFields = {
+    rentData: {
+      renter: uid,
+      from: from,
+      to: to
+    }
+  };
+  return catalog.updateCar(id, updateFields, function (err, car){
+    if (err) {
+      return res.status(400).send(responseTemplate('Error', err));
+    }
+    return res.status(200).send(responseTemplate('Ok', car));
+  });
+});
