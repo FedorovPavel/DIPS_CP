@@ -83,6 +83,14 @@ CatalogSchema.methods.getObject = function () {
   return container;
 }
 
+catalogModel.statics.saveDocument = function (document, callback) {
+  return document.save(function (err, newDoc) {
+    if (err)
+      return callback(err, null);
+    return callback(null, newDoc);
+  });
+}
+
 let catalogModel = mongoose.model('catalog', CatalogSchema);
 
 let middleware = class {
@@ -124,7 +132,7 @@ let middleware = class {
     return catalogModel.getCount(function (err, count) {
       if (err) {
         return callback(err, null);
-      } 
+      }
       return callback(null, count);
     });
   }
@@ -164,6 +172,34 @@ let middleware = class {
       let result = {};
       result = car.getObject();
       return callback(null, result);
+    });
+  }
+
+  createCar(info, callback) {
+    let err = false;
+    let newRecord = new catalogModel({
+      manufacture: info.manufacture,
+      type: info.type,
+      person: info.person,
+      cost: info.cost
+    });
+    if (info.model)
+      newRecord.model = info.model;
+    if (info.doors)
+      newRecord.doors = info.doors;
+    if (info.images)
+      newRecord.images = info.images;
+    info.rentDate = [];
+
+    return catalogModel.saveDocument(newRecord, function (err, document) {
+      if (err) {
+        return callback(err, null);
+      }
+      if (!document) {
+        return callback(null, null);
+      }
+      let res = document.getObject();
+      return callback(null, res);
     });
   }
 
