@@ -129,6 +129,44 @@ let middleware = class {
     });
   }
 
+  /**
+   * Get cars from ids 
+   * @param {Array} ids array of carId
+   * @param {function} callback callback with work result
+   */
+  getList(ids, callback) {
+    return catalogModel.getList(ids, function (err, cars) {
+      if (err)
+        return callback(err, null);
+      let result = [];
+      if (!cars || cars.length == 0)
+        return callback(null, result);
+      for (let I = 0; I < cars.length; I++) {
+        result.push(cars[I].getObject());
+      }
+      return callback(null, result);
+    });
+  }
+
+  /**
+   * Get car by id
+   * @param {string} id carId
+   * @param {function} callback callback with work result
+   */
+  getCar(id, callback) {
+    return catalogModel.getCar(id, function (err, car) {
+      if (err) {
+        return callback(err, null);
+      }
+      if (!car) {
+        return callback(null, null);
+      }
+      let result = {};
+      result = car.getObject();
+      return callback(null, result);
+    });
+  }
+
 }();
 
 module.exports = middleware;
