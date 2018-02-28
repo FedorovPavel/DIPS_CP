@@ -51,6 +51,15 @@ CatalogSchema.statics.getCars = function (skip, limit, cb) {
   }).skip(skip).limit(limit);
 }
 
+CatalogSchema.statics.getCount = function (callback) {
+  return this.find({}, function (err, count) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, count);
+  }).count();
+}
+
 //  Documents methods
 CatalogSchema.methods.getObject = function () {
   let imgs = [];
@@ -107,7 +116,19 @@ let middleware = class {
     });
   }
 
-  
+  /**
+   * Get count records on DB
+   * @param {function} callback callback with work result
+   */
+  getCount(callback) {
+    return catalogModel.getCount(function (err, count) {
+      if (err) {
+        return callback(err, null);
+      } 
+      return callback(null, count);
+    });
+  }
+
 }();
 
 module.exports = middleware;
