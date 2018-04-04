@@ -24,15 +24,18 @@ const CatalogSchema = new Schema({
     min: 1,
     required: true
   },
-  images: {
-    type: [String],
+  transmission: {
+    type: String,
+    enum: ['auto','manual', 'robot'],
+    required: true
   },
   rentDate: {
     type: [{
       renter: String,
       from: Date,
       to: Date
-    }]
+    }],
+    default: []
   },
   cost: {
     type: Number,
@@ -62,28 +65,25 @@ CatalogSchema.statics.getCount = function (callback) {
 
 //  Documents methods
 CatalogSchema.methods.getObject = function () {
-  let imgs = [];
-  if (this.images && this.images.length > 0) {
-    imgs = this.images.slice();
-  }
   let rentDates = [];
   if (this.rentDate && this.rentDate.length > 0) {
     rentDates = this.rentDate.slice();
   }
   let container = {
+    id: this._id.toString(),
     manufacture: this.manufacture,
     model: this.model,
     type: this.type,
     doors: this.doors,
     person: this.person,
-    images: imgs,
     rentDate: rentDates,
+    transmission: this.transmission,
     cost: this.cost
   };
   return container;
 }
 
-catalogModel.statics.saveDocument = function (document, callback) {
+CatalogSchema.statics.saveDocument = function (document, callback) {
   return document.save(function (err, newDoc) {
     if (err)
       return callback(err, null);
@@ -93,7 +93,7 @@ catalogModel.statics.saveDocument = function (document, callback) {
 
 let catalogModel = mongoose.model('catalog', CatalogSchema);
 
-let middleware = class {
+let middleware = new class {
   constructor() {
 
   }
@@ -106,12 +106,12 @@ let middleware = class {
    */
   getCars(page = 0, count = 10, callback) {
     let skip = page * count;
-    return catalogModel.getCars(skip, limit, function (err, carDocs) {
+    return catalogModel.getCars(skip, count, function (err, carDocs) {
       if (err) {
         callback(err, null);
       }
 
-      if (!carDocs) {
+      if (!carDocs || carDocs.length == 0) {
         return callback('Not found car on page : ' + page + ' in quanitity: ' + count);
       }
 
