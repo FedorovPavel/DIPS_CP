@@ -5,10 +5,11 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "NODE_ENV=test mocha --recursive test",
-    "test:coverage": "nyc npm test",
+    "test": "mocha --exit --recursive test",
+    "test:coverage": "nyc --reporter=html npm test",
     "test:unit": "mocha --recursive test/middleware test/models test/routes",
-    "test:integration": "mocha --recursive test/integration"
+    "test:integration": "mocha --recursive test/integration",
+    "test:model": "mocha --exit --recursive test/models"
   },
   "dependencies": {
     "body-parser": "^1.13.3",
