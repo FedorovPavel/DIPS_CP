@@ -55,12 +55,12 @@ CatalogSchema.statics.getCars = function (skip, limit, cb) {
 }
 
 CatalogSchema.statics.getCount = function (callback) {
-  return this.find({}, function (err, count) {
+  return this.count({}, function (err, count) {
     if (err) {
       return callback(err, null);
     }
     return callback(null, count);
-  }).count();
+  });
 }
 
 //  Documents methods

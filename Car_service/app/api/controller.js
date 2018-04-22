@@ -23,8 +23,10 @@ function responseTemplate(status, content) {
 
 //  get cars
 router.get('/', function (req, res, next) {
-  let page = Number(req.query.page);
-  let count = Number(req.query.count);
+  let page = req.query.page;
+  let count = req.query.count;
+  page = (page == undefined) ? 0 : Number(page);
+  count = (count == undefined) ? 10 : Nubmer(count);
   return catalog.getCars(page, count, function (err, cars) {
     if (err) {
       return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
@@ -34,10 +36,10 @@ router.get('/', function (req, res, next) {
         return res.status(500).send(responseTemplate('Error', 'Undefined count elements'));
       }
       const data = {
-        cars: result,
+        cars: cars,
         info: {
           count: countRecord,
-          pages: Math.ceil(count_record / count) - 1,
+          pages: Math.ceil(countRecord / count) - 1,
           current: page,
           limit: count
         }
@@ -126,7 +128,7 @@ router.put('/car/:id/rent', function (req, res, next) {
       to: to
     }
   };
-  return catalog.updateCar(id, updateFields, function (err, car){
+  return catalog.updateCar(id, updateFields, function (err, car) {
     if (err) {
       return res.status(400).send(responseTemplate('Error', err));
     }
