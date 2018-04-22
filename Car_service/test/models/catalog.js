@@ -205,7 +205,7 @@ describe('Test catalog model', () => {
 		it('get in empty db', (done) => {
 			model.getCount((err, result) => {
 				chai.expect(err).not.exist;
-				chai.expect(result.length).to.equal(0);
+				chai.expect(result).to.equal(0);
 				done();
 			});
 		});
@@ -213,7 +213,7 @@ describe('Test catalog model', () => {
 			generator(5, (cars) => {
 				model.getCount((err, result) => {
 					chai.expect(err).not.exist;
-					chai.expect(result.length).to.equal(5);
+					chai.expect(result).to.equal(5);
 					done();
 				});
 			});
@@ -314,7 +314,7 @@ describe('Test catalog model', () => {
 		it('get in empty db', (done) => {
 			manager.getCount((err, result) => {
 				chai.expect(err).not.exist;
-				chai.expect(result.length).to.equal(0);
+				chai.expect(result).to.equal(0);
 				done();
 			});
 		});
@@ -322,7 +322,7 @@ describe('Test catalog model', () => {
 			generator(15, (cars) => {
 				manager.getCount((err, result) => {
 					chai.expect(err).not.exist;
-					chai.expect(result.length).to.equal(15);
+					chai.expect(result).to.equal(15);
 					done();
 				});
 			});
