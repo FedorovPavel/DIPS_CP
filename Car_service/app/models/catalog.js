@@ -22,11 +22,12 @@ const CatalogSchema = new Schema({
   person: {
     type: Number,
     min: 1,
-    required: true
+    required: true,
+    default: 1
   },
   transmission: {
     type: String,
-    enum: ['auto','manual', 'robot'],
+    enum: ['auto', 'manual', 'robot'],
     required: true
   },
   rentDate: {
@@ -52,6 +53,24 @@ CatalogSchema.statics.getCars = function (skip, limit, cb) {
     }
     return cb(null, result);
   }).skip(skip).limit(limit);
+}
+
+CatalogSchema.statics.getList = function (ids, cb) {
+  return this.find({ _id: { $in: ids } }, function (err, list) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null, list);
+  });
+}
+
+CatalogSchema.statics.getCar = function (id, cb) {
+  return this.findById(id, function (err, list) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null, list);
+  });
 }
 
 CatalogSchema.statics.getCount = function (callback) {
@@ -88,6 +107,24 @@ CatalogSchema.statics.saveDocument = function (document, callback) {
     if (err)
       return callback(err, null);
     return callback(null, newDoc);
+  });
+}
+
+CatalogSchema.statics.removeCar = function (id, cb) {
+  return this.remove({_id : id}, function(err) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null);
+  });
+}
+
+CatalogSchema.statics.updateCar = function(id, info, cb) {
+  return this.findByIdAndUpdate(id, {$set : info}, {new: true}, function(err, car) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null, car);
   });
 }
 
@@ -143,7 +180,15 @@ let middleware = new class {
    * @param {function} callback callback with work result
    */
   getList(ids, callback) {
-    return catalogModel.getList(ids, function (err, cars) {
+    let tIds = [];
+    for (let I = 0; I < ids.length; I++) {
+      try {
+        tIds.push(mongoose.Types.ObjectId(ids[I]));
+      } catch (err) {
+        return callback({ message: "Invalid ID: " + ids[I] });
+      }
+    }
+    return catalogModel.getList(tIds, function (err, cars) {
       if (err)
         return callback(err, null);
       let result = [];
@@ -162,6 +207,11 @@ let middleware = new class {
    * @param {function} callback callback with work result
    */
   getCar(id, callback) {
+    try {
+      id = mongoose.Types.ObjectId(id);
+    } catch (err) {
+      return callback({ kind: "ObjectID", message: "Invalid ID" });
+    }
     return catalogModel.getCar(id, function (err, car) {
       if (err) {
         return callback(err, null);
@@ -175,12 +225,18 @@ let middleware = new class {
     });
   }
 
+  /**
+   * Create car with info from "info"
+   * @param {Object} info information about car
+   * @param {Function} callback 
+   */
   createCar(info, callback) {
     let err = false;
     let newRecord = new catalogModel({
       manufacture: info.manufacture,
       type: info.type,
       person: info.person,
+      transmission: info.transmission,
       cost: info.cost
     });
     if (info.model)
@@ -203,6 +259,43 @@ let middleware = new class {
     });
   }
 
+  /**
+   * Delete car with id= "id"
+   * @param {String} id CarId
+   * @param {Function} callback 
+   */
+  deleteCar(id, callback) {
+    try {
+      id = mongoose.Types.ObjectId(id);
+    } catch (err) {
+      return callback({ kind: "ObjectID", message: "Invalid ID" });
+    }
+    return catalogModel.removeCar(id, function(err) {
+      if (err)
+        return callback(err);
+      return callback(null);
+    });
+  }
+
+  /**
+   * Update information about car
+   * @param {String} id CarId
+   * @param {Object} info new information
+   * @param {Function} callback 
+   */
+  updateCar(id, info, callback) {
+    try {
+      id = mongoose.Types.ObjectId(id);
+    } catch (err) {
+      return callback({ kind: "ObjectID", message: "Invalid ID" });
+    }
+    return catalogModel.updateCar(id, info, function(err, uCar) {
+      if (err) {
+        return callback(err);
+      }
+      return callback(null, uCar.getObject());
+    });
+  }
 }();
 
 module.exports = middleware;
