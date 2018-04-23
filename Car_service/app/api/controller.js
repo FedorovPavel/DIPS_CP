@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const catalog = require('./../models/catalog');
 
 module.exports = (app) => {
-  app.use('/cars', router);
+  app.use('/', router);
 };
 
 /**
@@ -22,11 +22,11 @@ function responseTemplate(status, content) {
 }
 
 //  get cars
-router.get('/', function (req, res, next) {
+router.get('/cars', function (req, res, next) {
   let page = req.query.page;
   let count = req.query.count;
-  page = (page == undefined) ? 0 : Number(page);
-  count = (count == undefined) ? 10 : Nubmer(count);
+  page = (page == undefined || !Number.isInteger(Number(page))) ? 0 : Number(page);
+  count = (count == undefined || !Number.isInteger(Number(count))) ? 10 : Number(count);
   return catalog.getCars(page, count, function (err, cars) {
     if (err) {
       return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
@@ -52,7 +52,7 @@ router.get('/', function (req, res, next) {
 
 //  get many cars
 router.get('/list', function (req, res, next) {
-  let list = String(req.query('ids'));
+  let list = String(req.query.ids);
   if (list && list != "undefined" && list.length > 0) {
     list = list.split(',');
     return catalog.getList(list, function (err, cars) {
@@ -60,6 +60,7 @@ router.get('/list', function (req, res, next) {
         return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later'));
       }
       let response = responseTemplate('Ok', cars);
+      return res.status(200).send(response);
     });
   } else {
     return res.status(400).send(responseTemplate('Error', 'ids is not defined'));
@@ -84,7 +85,7 @@ router.get('/car/:id', function (req, res, next) {
 });
 
 //  create new car
-router.post('/newCar', function (req, res, next) {
+router.post('/', function (req, res, next) {
   const carInfo = req.body;
   return catalog.createCar(carInfo, function (err, car) {
     if (err) {
@@ -95,7 +96,7 @@ router.post('/newCar', function (req, res, next) {
 });
 
 //  update car
-router.put('/update/:id', function (req, res, next) {
+router.put('/:id', function (req, res, next) {
   const id = req.params.id;
   const updateFields = req.body;
   if (!updateFields || updateFields == undefined) {
@@ -110,7 +111,7 @@ router.put('/update/:id', function (req, res, next) {
 });
 
 //  update rent date
-router.put('/car/:id/rent', function (req, res, next) {
+router.put('/:id/rent', function (req, res, next) {
   const id = req.params.id;
   const uid = req.body.uid;
   if (!uid || uid == undefined) {
@@ -133,5 +134,18 @@ router.put('/car/:id/rent', function (req, res, next) {
       return res.status(400).send(responseTemplate('Error', err));
     }
     return res.status(200).send(responseTemplate('Ok', car));
+  });
+});
+
+router.delete('/:id', (req, res ,next) => {
+  const id = req.params.id;
+  if (id == undefined || id == 'undefined') {
+    return res.status(400).send(responseTemplate('Error', 'Bad id'));
+  }
+  return catalog.deleteCar(id, (err) => {
+    if (err) {
+      return res.status(500).send(responseTemplate('Error', err));
+    }
+    return res.status(200).send(responseTemplate('OK'));
   });
 });
