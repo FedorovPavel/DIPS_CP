@@ -111,7 +111,7 @@ CatalogSchema.statics.saveDocument = function (document, callback) {
 }
 
 CatalogSchema.statics.removeCar = function (id, cb) {
-  return this.remove({_id : id}, function(err) {
+  return this.remove({ _id: id }, function (err) {
     if (err) {
       return cb(err);
     }
@@ -119,8 +119,26 @@ CatalogSchema.statics.removeCar = function (id, cb) {
   });
 }
 
-CatalogSchema.statics.updateCar = function(id, info, cb) {
-  return this.findByIdAndUpdate(id, {$set : info}, {new: true}, function(err, car) {
+CatalogSchema.statics.updateCar = function (id, info, cb) {
+  return this.findByIdAndUpdate(id, { $set: info }, { new: true }, function (err, car) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null, car);
+  });
+}
+
+CatalogSchema.statics.addRentRecord = function (id, record, cb) {
+  return this.findByIdAndUpdate(id, { $push: { rentDate: record.rentDate } }, { new: true }, function (err, car) {
+    if (err) {
+      return cb(err);
+    }
+    return cb(null, car);
+  });
+}
+
+CatalogSchema.statics.removeRentRecord = function (id, record, cb) {
+  return this.findByIdAndUpdate(id, { $pull: { rentDate: record } }, { new: true }, function (err, car) {
     if (err) {
       return cb(err);
     }
@@ -129,6 +147,7 @@ CatalogSchema.statics.updateCar = function(id, info, cb) {
 }
 
 let catalogModel = mongoose.model('catalog', CatalogSchema);
+const uuid = require('uuid').v4;
 
 let middleware = new class {
   constructor() {
@@ -270,7 +289,7 @@ let middleware = new class {
     } catch (err) {
       return callback({ kind: "ObjectID", message: "Invalid ID" });
     }
-    return catalogModel.removeCar(id, function(err) {
+    return catalogModel.removeCar(id, function (err) {
       if (err)
         return callback(err);
       return callback(null);
@@ -289,12 +308,52 @@ let middleware = new class {
     } catch (err) {
       return callback({ kind: "ObjectID", message: "Invalid ID" });
     }
-    return catalogModel.updateCar(id, info, function(err, uCar) {
+    return catalogModel.updateCar(id, info, function (err, uCar) {
       if (err) {
         return callback(err);
       }
       return callback(null, uCar.getObject());
     });
+  }
+
+  /**
+   * Обновление даты аренды автомобиля
+   * @param {String} id ID пользователя
+   * @param {Object} info объект арендования автомобиля
+   * @param {Function} callback 
+   */
+  updateCarRent(id, info, callback) {
+    try {
+      id = mongoose.Types.ObjectId(id);
+    } catch (err) {
+      return callback({ kind: 'ObjectID', message: "Invalid ID" });
+    }
+    const state = info.state;
+    delete info.state;
+    switch (state) {
+      case 0: {  // Add
+        return catalogModel.addRentRecord(id, info, function (err, uCar) {
+          if (err) {
+            return callback(err);
+          }
+          return callback(null, uCar.getObject());
+        });
+        break;
+      }
+      case 1: {   //  Remove
+        return catalogModel.removeRentRecord(id, info, function (err, uCar) {
+          if (err) {
+            return callback(err);
+          }
+          return callback(null, uCar.getObject());
+        });
+        break;
+      }
+      default: {
+        return callback({ message: "State is undefined" });
+      }
+    }
+    return;
   }
 }();
 
