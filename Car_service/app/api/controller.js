@@ -117,19 +117,20 @@ router.put('/:id/rent', function (req, res, next) {
   if (!uid || uid == undefined) {
     return res.status(400).send(responseTemplate('Error', 'Bad request: userId is undefined'));
   }
-  const from = req.body.rentDataFrom;
-  const to = req.body.rentDataTo;
+  const from = Date.parse(req.body.from);
+  const to = Date.parse(req.body.to);
   if (!from || !to || from == undefined || to == undefined) {
     return res.status(400).send(responseTemplate('Error', 'Bad request: rent data is undefined'));
   }
   const updateFields = {
-    rentData: {
+    state: 0,
+    rentDate: {
       renter: uid,
-      from: from,
-      to: to
+      from: new Date(from),
+      to: new Date(to)
     }
   };
-  return catalog.updateCar(id, updateFields, function (err, car) {
+  return catalog.updateCarRent(id, updateFields, function (err, car) {
     if (err) {
       return res.status(400).send(responseTemplate('Error', err));
     }
@@ -147,5 +148,24 @@ router.delete('/:id', (req, res ,next) => {
       return res.status(500).send(responseTemplate('Error', err));
     }
     return res.status(200).send(responseTemplate('OK'));
+  });
+});
+
+//  update rent date
+router.delete('/:id/rent/:rid', function (req, res, next) {
+  const id = req.params.id;
+  const rid = req.params.rid;
+  if (!rid || rid == undefined) {
+    return res.status(400).send(responseTemplate('Error', 'Bad request: userId is undefined'));
+  }
+  const deleteRecord = {
+    state: 1,
+    _id: rid
+  };
+  return catalog.updateCarRent(id, deleteRecord, function (err, car) {
+    if (err) {
+      return res.status(400).send(responseTemplate('Error', err));
+    }
+    return res.status(200).send(responseTemplate('Ok', car));
   });
 });
