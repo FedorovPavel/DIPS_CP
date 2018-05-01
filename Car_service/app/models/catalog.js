@@ -32,9 +32,18 @@ const CatalogSchema = new Schema({
   },
   rentDate: {
     type: [{
-      renter: String,
-      from: Date,
-      to: Date
+      renter: {
+        type: String,
+        required: true
+      },
+      from: {
+        type: Date,
+        required: true
+      },
+      to: {
+        type: Date,
+        required: true
+      }
     }],
     default: []
   },
@@ -128,12 +137,41 @@ CatalogSchema.statics.updateCar = function (id, info, cb) {
   });
 }
 
-CatalogSchema.statics.addRentRecord = function (id, record, cb) {
-  return this.findByIdAndUpdate(id, { $push: { rentDate: record.rentDate } }, { new: true }, function (err, car) {
+CatalogSchema.statics.checkRentDate = function (id, from, to, cb) {
+  return this.findById(id, function (err, car) {
     if (err) {
       return cb(err);
     }
-    return cb(null, car);
+    if (!car) {
+      return cb({message: "Car not found"});
+    }
+    let state = true;
+    for (let I = 0; I < car.rentDate.length; I++) {
+      let item = car.rentDate[I];
+      if (!((to > item.to && from > item.to) || (to < item.from && from < item.from))) {
+        state = false;
+        break;
+      }
+    }
+    return cb(null, state);
+  });
+}
+
+CatalogSchema.statics.addRentRecord = function (id, record, cb) {
+  const that = this;
+  return this.checkRentDate(id , record.rentDate.from, record.rentDate.to, function (err, state) {
+    if (err) {
+      return cb(err);
+    }
+    if (!state) {
+      return cb({state: 'warning', code: "rent is busy"});
+    }
+    return that.findByIdAndUpdate(id, { $push: { rentDate: record.rentDate } }, { new: true }, function (err, car) {
+      if (err) {
+        return cb(err);
+      }
+      return cb(null, car);
+    });
   });
 }
 
