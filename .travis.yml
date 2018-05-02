@@ -7,7 +7,7 @@ install:
   - npm install -g mocha
 
 env:
-  - Car_dir=./Car_service/test/
+  - Car_dir=./test/
   # - Test_dir=./Lab1/test/models
   # - Test_dir=./Lab1/test/views
 
