@@ -70,7 +70,7 @@ describe('Test catalog model', () => {
 				cost: 100
 			});
 			doc.validate((err) => {
-				chai.expect(err.errors.person).to.exist;
+				chai.expect(err).not.to.exist;
 				done();
 			});
 		});

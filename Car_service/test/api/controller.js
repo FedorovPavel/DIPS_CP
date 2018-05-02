@@ -23,7 +23,7 @@ describe('controller', () => {
 		it('valid request without params', (done) => {
 			generate(20, (cars) => {
 				chai.request(server)
-					.get('/cars/')
+					.get('/cars')
 					.end((err, res) => {
 						res.status.should.equal(200);
 						res.should.to.be.json;
