@@ -1,13 +1,13 @@
 language: node_js
 node_js:
-  - "8.10.10"
+  - "8"
 
 install:
   - npm install
   - npm install -g mocha
 
 env:
-  - Car_dir=./test/
+  - Car_dir=./Car_service/test
   # - Test_dir=./Lab1/test/models
   # - Test_dir=./Lab1/test/views
 
