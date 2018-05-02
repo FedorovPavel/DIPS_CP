@@ -11,7 +11,7 @@ env:
   # - Test_dir=./Lab1/test/models
   # - Test_dir=./Lab1/test/views
 
-script:  cd $Test_dir && mocha */*.js
+script:  cd $Car_dir && mocha */*.js
 
 deploy:
   provider: openshift
