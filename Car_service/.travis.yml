@@ -1,3 +1,18 @@
+language: node_js
+node_js:
+  - "8.10.10"
+
+install:
+  - npm install
+  - npm install -g mocha
+
+env:
+  - Car_dir=./test/
+  # - Test_dir=./Lab1/test/models
+  # - Test_dir=./Lab1/test/views
+
+script:  cd $Test_dir && mocha */*.js
+
 deploy:
   provider: openshift
   user: "fedorovpavel"
