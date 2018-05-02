@@ -1,0 +1,6 @@
+deploy:
+  provider: openshift
+  user: "fedorovpavel"
+  password: "Cat19950214" # can be encrypted
+  domain: "http://cars-dips1car.a3c1.starter-us-west-1.openshiftapps.com/"
+  app: "dips1car"
