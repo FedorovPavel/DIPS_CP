@@ -1,10 +1,14 @@
 {
   "name": "car-service",
   "version": "0.0.1",
+  "engines": {
+    "node" : "8.10"
+  },
   "private": true,
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "production" : "NODE_ENV=production node app.js",
     "test": "mocha --exit --recursive test",
     "test:coverage": "nyc --reporter=html npm test",
     "test:unit": "mocha --recursive test/middleware test/models test/routes",

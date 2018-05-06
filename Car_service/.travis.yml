@@ -7,15 +7,13 @@ install:
   - npm install -g mocha
 
 env:
-  - Car_dir=./Car_service/test/
-  # - Test_dir=./Lab1/test/models
-  # - Test_dir=./Lab1/test/views
+  - Test_dir= ./test/
 
-script:  cd $Car_dir && mocha */*.js
-
+script: npm run test
+ 
 deploy:
-  provider: openshift
-  user: "fedorovpavel"
-  password: "Cat19950214" # can be encrypted
-  domain: "http://cars-dips1car.a3c1.starter-us-west-1.openshiftapps.com/"
-  app: "dips1car"
+  provider: heroku
+  app : dispcar
+  api_key:
+    secure: 2988dfd5-cf14-4875-a4dd-74dc9c8fad16
+  strategy: git 

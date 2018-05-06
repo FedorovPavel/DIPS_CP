@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+- '8'
+install:
+- npm install
+- npm install -g mocha
+env:
+- Car_dir=./test/
+script: cd $Car_dir && mocha --exit */*.js
+deploy:
+  provider: openshift
+  user: forsach95@mail.ru
+  password:
+    secure: L2IbnSfhVsLUbKU9Lv2YrivXy4L+vbX4pAmk8+Vq8QVAIbMs+wpqjF6Y/huHDL2QpvwXelieEd1tiaqDOjX2VRBOVp0I9lETjIWu5Wc2RGvEWwEg6yyn36TWWwSqTmSh3VzN8C1cSNUZhzmlyublkJBcIczyHmHADEEdE0Y0bJUhuYeEoTcKrI7EYONNpat1qb2xcoYuNS7pBs+eiHSRgndwXvkA9rHc4XxKIScVdyVysUb84/kS44bT+Zl8GPHiP3XBWvKgnMgNpzgGA1Hse3b/IXiCUzGHgfSoll/luBnVqdipFADGK11Slp94IGIybl10IukRq3QYJCHxoE58X02W9KiEe8AGhrSR/yV5b/wKokMkQemtJZUZQqleCmrbay27wFyjeJlStXk1oKXAIasD4vbZ7r+JnpyJ0bXNt6XdGTp4/r85/bqt+aUM58DH7xxk7c5q7Hd6tN+sLD7e2RX/CcyQ9m/ldgb8cwX37Nz1vi1wRcDBm3ZDvsk4Dt+65vw2NUirzPsxc5Ecdi0PMGb7ZFgMwey15RM1c1+B+OBLasc+maIkTXE2FFIz6EoPYMHk3k7KVAYEj8YPX8HG+DcnIqjpITIMOEvlOWlxLyHoj3IjiUuFCQz1jTY88LlDM10SUVGoPpXZAnnx5hraKxNh23u1Q72bYheMTWINTqA=
+  app: dips1car
+  domain: travisci-dips1car.a3c1.starter-us-west-1.openshiftapps.com
+  on:
+    repo: FedorovPavel/DIPS_CP_CarService
