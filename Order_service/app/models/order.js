@@ -3,17 +3,17 @@ const mongoose = require('mongoose'),
 	Billing = require('./billing');
 
 const OrderSchema = new Schema({
-	UserId: Schema.Types.ObjectId,
-	CarId: Schema.Types.ObjectId,
-	Billing: Billing.Schema,
-	Status: String,
-	Cost: {
+	userId: Schema.Types.ObjectId,
+	carId: Schema.Types.ObjectId,
+	billing: Billing.Schema,
+	status: String,
+	cost: {
 		type: Number,
 		required: true
 	},
-	Lease: {
-		StartDate: Date,
-		EndDate: Date
+	lease: {
+		startDate: Date,
+		endDate: Date
 	},
 	created: {
 		type: Number
@@ -40,20 +40,41 @@ OrderSchema.statics.getOrders = function (userId, page = 0, count = 20, callback
 	}).skip(page * count).limit(count);
 };
 
+OrderSchema.statics.getCount = function(uid, callback){
+  return this.count({userId : uid}, function(err, count){
+    if (err)
+      return callback(err, null);
+    return callback(null, count);
+  });
+}
+
 OrderSchema.methods.toObject = function () {
 	const item = {
 		id: this._id.toString(),
-		userId: this.UserId,
-		carId: this.CarId,
-		billing: this.Billing.toObject(),
-		status: this.Status,
+		userId: this.userId,
+		carId: this.carId,
+		billing: this.billing.toObject(),
+		status: this.status,
 		lease: {
-			startDate: this.lease.StartDate,
-			endDate: this.lease.EndDate
+			startDate: this.lease.startDate,
+			endDate: this.lease.endDate
 		},
 		created: this.created
 	};
 	return item;
 }
 
-mongoose.model('Order', OrderSchema);
+const orderORM = mongoose.model('Order', OrderSchema);
+
+const manager = new class {
+
+	getOrders(id, page, count, callback) {
+		return orderORM.getOrder(id, page, count, callback);
+	}
+
+	getCount(id) {
+		return orderORM.getCount(id, callback);
+	}
+}();
+
+module.exports = manager;
