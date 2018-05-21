@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
 
 const OrderSchema = new Schema({
 	userId: {
-		type: Schema.Types.ObjectId,
+		type: String,
 		required: true
 	},
 	carId: {
@@ -46,7 +46,7 @@ OrderSchema.statics.createOrder = function (objectInfo, callback) {
 				if (err)
 					return callback(err, null);
 				else {
-					return callback(null, result.toObject());
+					return callback(null, result.toOFullbject());
 				}
 			});
 		} else {
@@ -118,7 +118,7 @@ OrderSchema.statics.setConfirm = function (uid, id, callback) {
 		else {
 			if (order) {
 				if (order.status == 'Draft') {
-					order.Status = 'Confirm';
+					order.status = 'Confirm';
 					return order.save(function (err, res) {
 						if (err)
 							return callback(err, null);
@@ -136,18 +136,25 @@ OrderSchema.statics.setConfirm = function (uid, id, callback) {
 };
 
 OrderSchema.statics.setPaid = function (uid, id, info, callback) {
+	const mongoose = require('mongoose');
+	const model = mongoose.model('Billing');
 	return this.findOne({ _id: id, userId: uid }, function (err, order) {
 		if (err)
 			return callback(err, null);
 		else {
 			if (order) {
-				if (order.status == 'WaitForBilling') {
-					order.status = 'Paid';
-					order.billing = info;
-					return order.save(function (err, res) {
-						if (err)
+				if (order.status == 'Confirm') {
+					return model.createBilling(info, function(err, billing){
+						if (err) {
 							return callback(err, null);
-						return callback(null, res.toFullObject());
+						}
+						order.status = 'Paid';
+						order.billing = billing;
+						return order.save(function (err, res) {
+							if (err)
+								return callback(err, null);
+							return callback(null, res.toFullObject());
+						});
 					});
 				} else {
 					return callback({ message: "Status don't right" }, null);
@@ -191,8 +198,8 @@ OrderSchema.methods.toFullObject = function () {
 		carId: this.carId,
 		status: this.status,
 		lease: {
-			startDate: this.lease.startDate,
-			endDate: this.lease.endDate
+			from: this.lease.from,
+			to: this.lease.to
 		},
 		created: this.created
 	};
@@ -309,4 +316,19 @@ function createOrder(object) {
 	item.created = Date.now();
 	item.status = 'Draft';
 	return item;
+}
+
+function checkRequiredFields(objectKeys){
+  const keys = Array.from(objectKeys);
+  const requiredField = ['userId','carId', 'from', 'to', 'cost'];
+  let flag = 0;
+  for(let I = 0; I < keys.length; I++ ){
+    if (requiredField.indexOf(keys[I]) != -1)
+      flag++;
+  }
+  if (flag == requiredField.length) {
+    return true;
+  } else {
+    return false;
+  }
 }

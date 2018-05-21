@@ -19,7 +19,7 @@ BillingSchema.statics.createBilling = function (info, callback) {
 		if (err){
 			return callback(err, null);
 		}
-		return callback(null, billing.toFullObject());
+		return callback(null, billing);
 	});
 }
 
