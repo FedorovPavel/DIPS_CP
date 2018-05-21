@@ -64,10 +64,11 @@ router.post('/', function (req, res, next) {
 		let item = {
 			userId: getUserId(req),
 			carId: req.body.carID,
-			from: req.body.from,
-			to: req.body.to
+			from: Date.parse(req.body.from),
+			to: Date.parse(req.body.to),
+			cost: req.body.cost
 		};
-		return orders.createOrder(item, function (err, result) {
+		return orderManager.createOrder(item, function (err, result) {
 			if (err)
 				return res.status(400).send(responseTemplate('Error', err, scope));
 			if (result) {
@@ -82,7 +83,7 @@ router.put('/:id/confirm', function (req, res, next) {
 	return passport.checkServiceAuthorization(req, res, function(scope){
 		const id = req.params.id;
 		const uid = getUserId(req);
-		return orders.changeOrderStatus(uid, id, 1, function (err, result) {
+		return orderManager.changeOrderStatus(uid, id, 1, function (err, result) {
 			if (err) {
 				if (err.kind == "ObjectId")
 					return res.status(400).send(responseTemplate('Error', { message: 'Bad request: bad ID' }, scope));
@@ -90,11 +91,7 @@ router.put('/:id/confirm', function (req, res, next) {
 					return res.status(400).send(responseTemplate('Error', { message: err }, scope));
 			} else {
 				if (result) {
-					const data = {
-						content: result,
-						service: scope
-					};
-					return res.status(200).send(data);
+					return res.status(200).send(responseTemplate('Ok', result, scope));
 				}
 				return res.status(404).send(responseTemplate('Error', { message: 'Not found order' }, scope));
 			}
