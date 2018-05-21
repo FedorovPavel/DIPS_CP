@@ -8,7 +8,7 @@ const OrderSchema = new Schema({
 		required: true
 	},
 	carId: {
-		type: Schema.Types.ObjectId,
+		type: String,
 		required: true
 	},
 	billing: Billing.Schema,
@@ -21,12 +21,12 @@ const OrderSchema = new Schema({
 		required: true
 	},
 	lease: {
-		startDate: {
-			type: Date,
+		from: {
+			type: Number,
 			required: true
 		},
-		endDate: {
-			type: Date,
+		to: {
+			type: Number,
 			required: true
 		}
 	},
@@ -57,17 +57,29 @@ OrderSchema.statics.createOrder = function (objectInfo, callback) {
 	}
 };
 
+OrderSchema.statics.changeOrder = function (id, objectInfo, callback) {
+	let object = Object(objectInfo);
+	let query = transformOrderQuery(object);
+	const that = this;
+	return that.findByIdAndUpdate(id, {$set : query}, function (err, order) {
+		if (err) {
+			return callback(err, null);
+		}
+		return callback(null, order.toFullObject());
+	});
+}
+
 OrderSchema.statics.getOrders = function (userId, page = 0, count = 20, callback) {
 	page = Number(page);
 	count = Number(count);
-	return this.find({ UserId: userId }, function (err, orders) {
+	return this.find({ userId: userId }, function (err, orders) {
 		if (err)
 			return callback(err, null);
 		else {
 			if (orders) {
 				let result = [];
 				for (let I = 0; I < orders.length; I++) {
-					result.push(orders[I].toObject());
+					result.push(orders[I].toFullObject());
 				}
 				return callback(null, result);
 			} else {
@@ -83,7 +95,7 @@ OrderSchema.statics.getOrder = function (uid, id, callback) {
 			return callback(err, null);
 		else {
 			if (result) {
-				return callback(null, result.toObject());
+				return callback(null, result.toFullObject());
 			} else {
 				return callback(null, null);
 			}
@@ -111,7 +123,7 @@ OrderSchema.statics.setConfirm = function (uid, id, callback) {
 						if (err)
 							return callback(err, null);
 						else
-							return callback(null, res);
+							return callback(null, res.toFullObject());
 					});
 				} else {
 					return callback({ message: "Status don't right" }, null);
@@ -135,8 +147,7 @@ OrderSchema.statics.setPaid = function (uid, id, info, callback) {
 					return order.save(function (err, res) {
 						if (err)
 							return callback(err, null);
-						else
-							return callback(null, res.toObject());
+						return callback(null, res.toFullObject());
 					});
 				} else {
 					return callback({ message: "Status don't right" }, null);
@@ -160,7 +171,7 @@ OrderSchema.statics.setComplete = function (uid, id, callback) {
 						if (err)
 							return callback(err, null);
 						else {
-							return callback(null, res.toObject());
+							return callback(null, res.toFullObject());
 						}
 					});
 				} else {
@@ -173,12 +184,11 @@ OrderSchema.statics.setComplete = function (uid, id, callback) {
 	});
 };
 
-OrderSchema.methods.toObject = function () {
+OrderSchema.methods.toFullObject = function () {
 	const item = {
 		id: this._id.toString(),
 		userId: this.userId,
 		carId: this.carId,
-		billing: this.billing.toObject(),
 		status: this.status,
 		lease: {
 			startDate: this.lease.startDate,
@@ -186,6 +196,9 @@ OrderSchema.methods.toObject = function () {
 		},
 		created: this.created
 	};
+	if (this.billing != undefined) {
+		item.billing = this.billing.toFullObject();
+	}
 	return item;
 }
 
@@ -209,6 +222,10 @@ const manager = new class {
 		return orderORM.createOrder(objectInfo, callback);
 	}
 
+	changeOrder(id, objectInfo, callback) {
+		return orderORM.changeOrder(id, objectInfo, callback);
+	}
+
 	changeOrderStatus(uid, id, state, callback, info = undefined) {
 		switch (state) {
 			case 1: {
@@ -229,6 +246,38 @@ const manager = new class {
 
 module.exports = manager;
 
+function transformOrderQuery(object) {
+	let query = {};
+	for (key in object) {
+		switch (key) {
+			case 'userId':
+				query.userId = object[key];
+				break;
+			case 'carId':
+				query.carId = object[key];
+				break;
+			case 'from':
+				query.lease.from = new Date(object[key]).getTime();
+				break;
+			case 'to':
+				query.lease.to = new Date(object[key]).getTime();
+				break;
+			case 'cost' : 
+				query.cost = object[key];
+				break;
+			case 'created' : 
+				query.created = object[key];
+				break;
+			case 'status': 
+				query.status = object[key];
+				break;
+			default:
+				break;
+		}
+	}
+	return query;
+}
+
 function createOrder(object) {
 	const model = mongoose.model('Order');
 	let item = new model();
@@ -236,16 +285,19 @@ function createOrder(object) {
 	for (key in object) {
 		switch (key) {
 			case 'userId':
-				item.userId = mongoose.Types.ObjectId(object[key]);
+				item.userId = object[key];
 				break;
 			case 'carId':
-				item.carId = mongoose.Types.ObjectId(object[key]);
+				item.carId = object[key];
 				break;
-			case 'startDate':
-				item.lease.startDate = new Date(object[key]);
+			case 'from':
+				item.lease.from = new Date(object[key]).getTime();
 				break;
-			case 'endDate':
-				item.lease.endDate = new Date(object[key]);
+			case 'to':
+				item.lease.to = new Date(object[key]).getTime();
+				break;
+			case 'cost' : 
+				item.cost = object[key];
 				break;
 			default:
 				errorParse = true;
@@ -255,6 +307,6 @@ function createOrder(object) {
 	if (errorParse)
 		return null;
 	item.created = Date.now();
-	item.Status = 'Draft';
+	item.status = 'Draft';
 	return item;
 }

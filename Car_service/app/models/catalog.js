@@ -37,11 +37,11 @@ const CatalogSchema = new Schema({
         required: true
       },
       from: {
-        type: Date,
+        type: Number,
         required: true
       },
       to: {
-        type: Date,
+        type: Number,
         required: true
       }
     }],
@@ -55,8 +55,9 @@ const CatalogSchema = new Schema({
 });
 
 //  Statics methods
-CatalogSchema.statics.getCars = function (skip, limit, cb) {
-  return this.find({}, function (err, result) {
+CatalogSchema.statics.getCars = function (skip, limit, filters, cb) {
+  const param = transformFilterToQuery(filters);
+  return this.find(param, function (err, result) {
     if (err) {
       return cb(err, null);
     }
@@ -65,7 +66,11 @@ CatalogSchema.statics.getCars = function (skip, limit, cb) {
 }
 
 CatalogSchema.statics.getList = function (ids, cb) {
-  return this.find({ _id: { $in: ids } }, function (err, list) {
+  return this.find({
+    _id: {
+      $in: ids
+    }
+  }, function (err, list) {
     if (err) {
       return cb(err);
     }
@@ -120,7 +125,9 @@ CatalogSchema.statics.saveDocument = function (document, callback) {
 }
 
 CatalogSchema.statics.removeCar = function (id, cb) {
-  return this.remove({ _id: id }, function (err) {
+  return this.remove({
+    _id: id
+  }, function (err) {
     if (err) {
       return cb(err);
     }
@@ -129,7 +136,11 @@ CatalogSchema.statics.removeCar = function (id, cb) {
 }
 
 CatalogSchema.statics.updateCar = function (id, info, cb) {
-  return this.findByIdAndUpdate(id, { $set: info }, { new: true }, function (err, car) {
+  return this.findByIdAndUpdate(id, {
+    $set: info
+  }, {
+    new: true
+  }, function (err, car) {
     if (err) {
       return cb(err);
     }
@@ -143,7 +154,9 @@ CatalogSchema.statics.checkRentDate = function (id, from, to, cb) {
       return cb(err);
     }
     if (!car) {
-      return cb({message: "Car not found"});
+      return cb({
+        message: "Car not found"
+      });
     }
     let state = true;
     for (let I = 0; I < car.rentDate.length; I++) {
@@ -159,14 +172,23 @@ CatalogSchema.statics.checkRentDate = function (id, from, to, cb) {
 
 CatalogSchema.statics.addRentRecord = function (id, record, cb) {
   const that = this;
-  return this.checkRentDate(id , record.rentDate.from, record.rentDate.to, function (err, state) {
+  return this.checkRentDate(id, record.rentDate.from, record.rentDate.to, function (err, state) {
     if (err) {
       return cb(err);
     }
     if (!state) {
-      return cb({state: 'warning', code: "rent is busy"});
+      return cb({
+        state: 'warning',
+        code: "rent is busy"
+      });
     }
-    return that.findByIdAndUpdate(id, { $push: { rentDate: record.rentDate } }, { new: true }, function (err, car) {
+    return that.findByIdAndUpdate(id, {
+      $push: {
+        rentDate: record.rentDate
+      }
+    }, {
+      new: true
+    }, function (err, car) {
       if (err) {
         return cb(err);
       }
@@ -176,7 +198,13 @@ CatalogSchema.statics.addRentRecord = function (id, record, cb) {
 }
 
 CatalogSchema.statics.removeRentRecord = function (id, record, cb) {
-  return this.findByIdAndUpdate(id, { $pull: { rentDate: record } }, { new: true }, function (err, car) {
+  return this.findByIdAndUpdate(id, {
+    $pull: {
+      rentDate: record
+    }
+  }, {
+    new: true
+  }, function (err, car) {
     if (err) {
       return cb(err);
     }
@@ -198,9 +226,9 @@ let middleware = new class {
    * @param {Number} count count cars getting from DB
    * @param {function} callback callback with work result
    */
-  getCars(page = 0, count = 10, callback) {
+  getCars(page = 0, count = 10, filters, callback) {
     let skip = page * count;
-    return catalogModel.getCars(skip, count, function (err, carDocs) {
+    return catalogModel.getCars(skip, count, filters, function (err, carDocs) {
       if (err) {
         callback(err, null);
       }
@@ -242,7 +270,9 @@ let middleware = new class {
       try {
         tIds.push(mongoose.Types.ObjectId(ids[I]));
       } catch (err) {
-        return callback({ message: "Invalid ID: " + ids[I] });
+        return callback({
+          message: "Invalid ID: " + ids[I]
+        });
       }
     }
     return catalogModel.getList(tIds, function (err, cars) {
@@ -267,7 +297,10 @@ let middleware = new class {
     try {
       id = mongoose.Types.ObjectId(id);
     } catch (err) {
-      return callback({ kind: "ObjectID", message: "Invalid ID" });
+      return callback({
+        kind: "ObjectID",
+        message: "Invalid ID"
+      });
     }
     return catalogModel.getCar(id, function (err, car) {
       if (err) {
@@ -325,7 +358,10 @@ let middleware = new class {
     try {
       id = mongoose.Types.ObjectId(id);
     } catch (err) {
-      return callback({ kind: "ObjectID", message: "Invalid ID" });
+      return callback({
+        kind: "ObjectID",
+        message: "Invalid ID"
+      });
     }
     return catalogModel.removeCar(id, function (err) {
       if (err)
@@ -344,7 +380,10 @@ let middleware = new class {
     try {
       id = mongoose.Types.ObjectId(id);
     } catch (err) {
-      return callback({ kind: "ObjectID", message: "Invalid ID" });
+      return callback({
+        kind: "ObjectID",
+        message: "Invalid ID"
+      });
     }
     return catalogModel.updateCar(id, info, function (err, uCar) {
       if (err) {
@@ -364,35 +403,86 @@ let middleware = new class {
     try {
       id = mongoose.Types.ObjectId(id);
     } catch (err) {
-      return callback({ kind: 'ObjectID', message: "Invalid ID" });
+      return callback({
+        kind: 'ObjectID',
+        message: "Invalid ID"
+      });
     }
     const state = info.state;
     delete info.state;
     switch (state) {
-      case 0: {  // Add
-        return catalogModel.addRentRecord(id, info, function (err, uCar) {
-          if (err) {
-            return callback(err);
-          }
-          return callback(null, uCar.getObject());
-        });
-        break;
-      }
-      case 1: {   //  Remove
-        return catalogModel.removeRentRecord(id, info, function (err, uCar) {
-          if (err) {
-            return callback(err);
-          }
-          return callback(null, uCar.getObject());
-        });
-        break;
-      }
-      default: {
-        return callback({ message: "State is undefined" });
-      }
+      case 0:
+        { // Add
+          return catalogModel.addRentRecord(id, info, function (err, uCar) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, uCar.getObject());
+          });
+          break;
+        }
+      case 1:
+        { //  Remove
+          return catalogModel.removeRentRecord(id, info, function (err, uCar) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, uCar.getObject());
+          });
+          break;
+        }
+      default:
+        {
+          return callback({
+            message: "State is undefined"
+          });
+        }
     }
     return;
   }
 }();
 
 module.exports = middleware;
+
+function transformFilterToQuery(filters) {
+  let queryParam = {};
+  for (let key in filters) {
+    switch (key) {
+      case 'ma':
+        queryParam.manufacture = filters[key];
+        break;
+      case 'mo':
+        queryParam.model = filters[key];
+        break;
+      case 't':
+        queryParam.type = {
+          $in: filters[key].split(',')
+        };
+        break;
+      case 'd':
+        queryParam.doors = filters[key];
+        break;
+      case 'p':
+        {
+          queryParam.person = filters[key];
+          break;
+        }
+      case 'tr':
+        {
+          queryParam.transmission = filters[key];
+          break;
+        }
+      case 'minC':
+        {
+          queryParam.cost['$gt'] = filters[key];
+          break;
+        }
+      case 'maxC':
+        {
+          queryParam.cost['$lt'] = filters[key];
+          break;
+        }
+    }
+  }
+  return queryParam;
+}
