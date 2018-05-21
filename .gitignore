@@ -1,2 +1,7 @@
 temp/
 Car_service/.git/
+Car_service/node_modules
+AggregationService/node_modules
+AuthService/node_modules
+Order_service/node_modules
+StatisticsService/node_modules
