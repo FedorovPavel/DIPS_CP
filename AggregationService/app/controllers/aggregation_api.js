@@ -1,7 +1,8 @@
 var express   = require('express'),
     router    = express.Router(),
     crypto    = require('crypto'),
-    appId     = require('./../../config/config').app.id,
+	appId     = require('./../../config/config').app.id,
+	mailApp   = require('../../config/config').mailApp;
     bus       = require('./../coordinator/bus'),
     validator = require('./../validator/validator'),
     amqp      = require('amqplib/callback_api'),
@@ -119,6 +120,34 @@ router.get('/code', function(req, res, next){
     return statSender.sendAuthorizationInfo(info);
   });
 });
+
+//mail auth
+router.get('/mailAuth', function(req, res, next){
+	const authUrl = "https://connect.mail.ru/oauth/authorize?";
+	const aggregatorUrl = "http://localhost:3000/aggregator/mailCode";
+	const queryParametrs = ['client_id='+mailApp.id, 'response_type=code', 'redirect_uri='+aggregatorUrl];
+	const url = authUrl + queryParametrs.join('&');
+	return res.status(302).redirect(url);
+});
+
+router.get('/mailCode', function(req, res, next){
+	const code = decodeURIComponent(req.query.code);
+	if (!code || typeof(code) == 'undefined' || code.length == 0)
+	  return res.status(500).send({status : "Service Error", message : "Authorization service did not send code"});
+	const info = {
+	  code : code
+	};
+
+	return bus.getMailToken(info, function(err, status, response){
+	  res.status(status).send(response);
+	  bus.saveMailTokensToAuth(response);
+	  const info = {
+		status : status,
+		response : response
+	  };
+	  return statSender.sendAuthorizationInfo(info);
+	});
+  });
 
 // Get any cars
 router.get('/catalog', function(req, res, next){

@@ -128,6 +128,31 @@ router.get('/userId', function(req, res, next){
   return res.status(401).send(getResponseObject('Service error', 'Header "Authorization" is undefined'));
 });
 
+
+router.post('/saveMailTokens', function(req, res, next){
+	const header_auth = req.headers['authorization'];     //  считываем заголовок из headers
+	//  если такой заголовк есть и он не пуст
+	if (header_auth && typeof(header_auth) !== 'undefined'){
+	  //  Проверим авторизацию сервиса aggregator
+	  return passport.checkServiceAuthorization(header_auth, function(err, status, scope){
+		//  Если ошибка вернуть ошибку для сервиса
+		if (err)
+		  return res.status(status).send(getResponseObject('Service error', err));
+
+		var mongoose = require('mongoose');
+		var userManager = mongoose.model('User');
+		
+		userManager.createMailUser(req.body, function(err, userId) {
+			if(!err && userId)
+				res.status(200).send({userId: userId});
+			else
+				res.status(500).send(getResponseObject('Service error', err));
+		});
+	  });
+	} 
+	return res.status(401).send(getResponseObject('Service error', 'Header "Authorization" is undefined'));
+  });
+
 function getResponseObject(status, response){
   return {
     status : status,
