@@ -1,7 +1,8 @@
-@main-color         : #0288d1;
+@main-color         : #eeeeee;
 @light-text         : #ffffff;
-@menu-field         : #6699FF;
-@menu-field-hover   : #527eff;
+@auth-color         : #29c230;
+@menu-field         : rgb(255, 145, 0);
+@menu-field-hover   : rgb(255, 73, 0);
 @dark-text          : #353535;
 @menu-field-active  : #eeeeee;
 @screen-lg-min      : 1200px;
@@ -10,46 +11,87 @@
 
 div.navbar-wrapper{
     background: @main-color;
-    height: 100px;
-    div.logo{
-        img{
-            height: 60px;
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.5);
+    div.row.line{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        div.logo{
+            vertical-align: middle;
+            height: 40px;
+            img{
+                height: 100%;
+                filter: invert(1);
+            }
+            p{
+                margin-left: 10px;
+                font-size:24px;
+                font-weight: 1000;
+                font-style: italic;
+                font-family: 'Times New Roman', Times, serif;
+                text-decoration: underline;
+                color: @dark-text;
+                display: inline-block;
+            }
         }
-    }
-    div.name{
-        vertical-align: middle;
-        height: 60px;
-        p{
-            margin-top: 12px;
-            font-size:24px;
-            font-weight: 800;
-            font-style: italic;
-            text-decoration: underline;
+        ul.nav{
+            height: 35px;
+            margin: 10px 0px 10px 30px;
+            li{
+                transition-delay: 0ms;
+                transition-duration: 350ms;
+                transition-timing-function: ease;
+                transition-property: border;
+                margin-right: 30px;
+                cursor: pointer;
+                span{
+                    transition-delay: 0ms;
+                    transition-duration: 1350ms;
+                    transition-timing-function: ease;
+                    transition-property: font-size;
+                    font-size:18px;   
+                    font-family: 'Times New Roman', Times, serif;
+                    color: @menu-field;
+                }
+            }
+            li:hover{
+                border-bottom: 3px solid @menu-field-hover;
+            }
+            li.active{
+                border-bottom: 3px solid @menu-field-hover;
+                span{
+                    color: @menu-field-hover;
+                }
+            }
+        }
+        button.button{
+            border-radius: 5px;
+            border: none;
+        }
+        button.auth-button{
+            // height: 20px;
+            padding: 5px 10px;
+            margin: 0px 35px;
+            width: ~'calc(100% - 70px)';
+            font-family: 'Times New Roman', Times, serif;
+            background: @auth-color;
+            overflow: hidden;
+            outline: none;
             color: @light-text;
         }
-    }
-    ul.nav{
-        margin: 7px 0px 0px 30px;
-        li{
-            a{
-                font-size:18px;   
-                color: @light-text;
-                background: @menu-field;
-            }
-        }
-        li:hover{
-            a{
-                font-size:18px;   
-                color: @light-text;
-                background: @menu-field-hover;
-            }
-        }
-        li.active{
-            a{
-                font-size:18px;   
-                color: @dark-text;
-                background: @menu-field-active;
-            }
+        button.reg-button{
+            // height: 20px;
+            padding: 2px 10px;
+            margin: 0px 35px;
+            width: ~'calc(100% - 70px)';
+            font-family: 'Times New Roman', Times, serif;
+            text-decoration: underline;
+            font-size: 12px;
+            background: inherit;
+            overflow: hidden;
+            outline: none;
+            color: @dark-text;
         }
     }
 }

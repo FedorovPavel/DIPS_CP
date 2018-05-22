@@ -280,10 +280,10 @@ class menu {
         });
         //  Заполнение полей
         $(panel).find('h2.title').text("Оформление заказа");
-        $(panel).find('span.manufacture').text(car.Manufacturer);
-        $(panel).find('span.model').text(car.Model);
-        $(panel).find('span.type').text(car.Type);
-        $(panel).find('span.cost').text(car.Cost);
+        $(panel).find('span.manufacture').text(car.manufacturer);
+        $(panel).find('span.model').text(car.model);
+        $(panel).find('span.type').text(car.type);
+        $(panel).find('span.cost').text(car.cost);
         $(panel).attr('carId', car.id);
         //  Поле ошибок заполнения
         const err_line = $(panel).find('span.dataErr');
@@ -309,8 +309,8 @@ class menu {
         //  Формирование даты
         let data = {
             carID       : self.checkID($(panel).attr('carId')),
-            startDate   : self.ConvertStringToDate($(form).find('input#startDate').val()),
-            endDate     : self.ConvertStringToDate($(form).find('input#endDate').val())
+            from   : self.ConvertStringToDate($(form).find('input#startDate').val()),
+            to     : self.ConvertStringToDate($(form).find('input#endDate').val())
         };
         //  Поле ошибок заполнения
         const err_line = $(panel).find('span.dataErr');
@@ -320,13 +320,13 @@ class menu {
             return;
         }
         //  Проверка даты начала ренты
-        if (!data.startDate){
+        if (!data.from){
             $(panel).find('input#startDate').focus();
             $(err_line).text('Неправильная дата начала аренды');
             return;
         }
         //  Проверка даты окончания ренты
-        if (!data.endDate){
+        if (!data.to){
             $(panel).find('input#endDate').focus();
             $(err_line).text('Неправильная дата окончания аренды');
             return;

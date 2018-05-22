@@ -1,17 +1,17 @@
 div.navbar-wrapper
     div.container
-        div.row
-            div.col-xs-2.logo
+        div.row.line
+            div.col-xs-4.logo
                 img(src='/img/logo.png', alt='logo')
-            div.col-xs-2.name
-                p.text-center.nav-title FrontEnd
+                p.text-center.nav-title QuickRentCar
             div.col-xs-6
                 ul#nav-pills.nav.nav-pills
                     li#automobile-pill.active 
-                        a Автомобили
+                        span Автомобили
                     li#orders-pill 
-                        a Заказы
+                        span Заказы
                     li#report-pill
-                        a Отчеты
+                        span Отчеты
             div.col-xs-2
-                button#auth_submit Зайти
+                button#auth_submit.button.auth-button Войти
+                button#reg_submit.button.reg-button Регистрация

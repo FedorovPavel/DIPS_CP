@@ -8,7 +8,7 @@ const config = {
     app: {
       name: 'order-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3002,
     db: 'mongodb://localhost/order-service-development'
   },
 
@@ -17,7 +17,7 @@ const config = {
     app: {
       name: 'order-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3002,
     db: 'mongodb://localhost/order-service-test'
   },
 
@@ -26,7 +26,7 @@ const config = {
     app: {
       name: 'order-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3002,
     db: 'mongodb://localhost/order-service-production'
   }
 };

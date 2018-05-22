@@ -71,7 +71,7 @@ module.exports = {
     //  Catalog methods
     getCars: function (dataContainer, callback) {
         let main_function = function(data, callback){
-            const url = _CatalogHost + '/catalog?page=' + data.page + '&count=' + data.count;
+            const url = _CatalogHost + '/cars?page=' + data.page + '&count=' + data.count;
             const options = createOptions(url, 'GET', CatalogToken);
             return createAndSendGetHttpRequest(options, function (err, status, response) {
                 return responseHandlerObject(err, status, response, function(err, status, response){
@@ -86,7 +86,7 @@ module.exports = {
     },
     getCar: function (data, callback) {
         let main_function = function(data, callback){
-            const url = _CatalogHost + '/catalog/' + data.id;
+            const url = _CatalogHost + '/car/' + data.id;
             const options = createOptions(url, "GET", CatalogToken);
             return createAndSendGetHttpRequest(options, function (err, status, response) {
                 return responseHandlerObject(err, status, response, function (err, status, response) {
@@ -101,6 +101,24 @@ module.exports = {
             });
         }
         return main_function(data, callback);
+    },
+    getCarList: function (ids, callback) {
+        let main_function = function(data, callback){
+            const url = _CatalogHost + '/list?ids=' + ids;
+            const options = createOptions(url, "GET", CatalogToken);
+            return createAndSendGetHttpRequest(options, function (err, status, response) {
+                return responseHandlerObject(err, status, response, function (err, status, response) {
+                    const repeat = checkServicesInformationFromCatalog(status, response, main_function, data, callback);
+                    if (!repeat){
+                        if (status == 200)
+                            response = response.content;
+                        return callback(err, status, response);
+                    }
+                    return;
+                }); 
+            });
+        }
+        return main_function(ids, callback);
     },
     //  Orders methods
     createOrder: function (data, callback) {
@@ -156,9 +174,9 @@ module.exports = {
     },
     orderPaid: function (data, callback) {
         let main_function = function(data, callback){
-            const url = _OrderHost + '/orders/' + data.order_id + '/paid/' + data.billing_id;
+            const url = _OrderHost + '/orders/' + data.order_id + '/paid';
             const options = createOptions(url, "PUT", OrderToken, null, data.userId);
-            return createAndSendPutWithFormHttpRequest(options, null, function (err, status, response) {
+            return createAndSendPutWithFormHttpRequest(options, data.data, function (err, status, response) {
                 return responseHandlerObject(err, status, response, function(err, status, response){
                     const repeat = checkServicesInformationFromOrder(status, response, main_function, data, callback);
                     if (!repeat){
@@ -172,7 +190,7 @@ module.exports = {
     },
     orderConfirm: function (data, callback) {
         let main_function = function(data, callback){
-            const url = _OrderHost + '/orders/confirm/' + data.order_id;
+            const url = _OrderHost + '/orders/' + data.order_id + '/confirm';
             const options = createOptions(url, "PUT", OrderToken, null, data.userId);
             return createAndSendPutWithFormHttpRequest(options, null, function (err, status, response) {    
                 return responseHandlerObject(err, status, response, function(err, status, response){
@@ -189,7 +207,7 @@ module.exports = {
     },
     orderComplete: function (data, callback) {
         let main_function = function(data, callback){
-            const url = _OrderHost + '/orders/complete/' + data.orderId;
+            const url = _OrderHost + '/orders/' + data.orderId + '/complete';
             const options = createOptions(url, "PUT", OrderToken, null, data.userId);
             return createAndSendPutWithFormHttpRequest(options, null, function (err, status, response) {
                 return responseHandlerObject(err, status, response, function(err, status, response){
@@ -206,7 +224,7 @@ module.exports = {
     },
     checkOrderService : function(callback){
         let main_function = function(callback){
-            const url = _OrderHost +'/orders/live';
+            const url = _OrderHost +'/orders/live/service';
             const options = createOptions(url, 'HEAD', OrderToken);
             return createAndSendHeadHttpRequest(options, function(err, status){
                 const repeat = checkServicesInformationFromOrder(status, {status:'Service error'}, main_function, callback, null);
@@ -388,10 +406,10 @@ function checkServicesInformationFromAuth(status, response, method, info, callba
         AuthToken = null;
         method(info, callback);
         return true;
-    } else if (typeof(response.service) != 'undefined'){
+    } else if (typeof(response.scope) != 'undefined'){
         console.log('Set new AuthToken Token');
-        AuthToken = response.service;
-        delete response.service;
+        AuthToken = response.scope;
+        delete response.scope;
     }
     return false;
 }
@@ -403,10 +421,10 @@ function checkServicesInformationFromCatalog(status, response, method, info, cal
         CatalogToken = null;
         method(info, callback);
         return true;
-    } else if (typeof(response.service) != 'undefined'){
+    } else if (response.scope != undefined){
         console.log('Set new CatalogToken');
-        CatalogToken = response.service;
-        delete response.service;
+        CatalogToken = response.scope;
+        delete response.scope;
     }
     return false;
 }
@@ -418,10 +436,10 @@ function checkServicesInformationFromOrder(status, response, method, info, callb
         OrderToken = null;
         method(info, callback);
         return true;
-    } else if (typeof(response.service) != 'undefined'){
+    } else if ( response && typeof(response.scope) != 'undefined'){
         console.log('Set new OrderToken');
-        OrderToken = response.service;
-        delete response.service;
+        OrderToken = response.scope;
+        delete response.scope;
     }
     return false;
 }
@@ -450,10 +468,10 @@ function checkServicesInformationFromStat(status, response, method, info, callba
         method(info, callback);
         return true;
     } 
-    if (response && typeof(response.service) != 'undefined'){
+    if (response && typeof(response.scope) != 'undefined'){
         console.log('Set new StatToken');
-        StatToken = response.service;
-        delete response.service;
+        StatToken = response.scope;
+        delete response.scope;
     }
     return false;
 }

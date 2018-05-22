@@ -1,0 +1,12 @@
+head
+	link(rel='stylesheet', href="/css/style.css")
+body
+	form#authForm(method="POST", action="/auth/registration")
+		input.hidden(name="app_id", value=app_id, readonly)
+		p Логин
+		input(name="login", required)
+		p Пароль
+		input(name="password", type="password", required)
+		p Повторите пароль
+		input(name="rpassword", type="password", required)
+		input.on-center(type="submit")

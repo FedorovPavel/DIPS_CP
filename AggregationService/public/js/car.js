@@ -40,11 +40,11 @@ class car{
                     $(this).attr('state', 'close');
                 }
             });
-            $(record).find('h4.title').text(content.Manufacturer + ' ' + content.Model);
-            $(record).find('span.manufacture').text(content.Manufacturer);
-            $(record).find('span.model').text(content.Model);
-            $(record).find('span.type').text(content.Type);
-            $(record).find('span.cost').text(content.Cost);
+            $(record).find('h4.title').text(content.manufacture + ' ' + content.model);
+            $(record).find('span.manufacture').text(content.manufacture);
+            $(record).find('span.model').text(content.model);
+            $(record).find('span.type').text(content.type);
+            $(record).find('span.cost').text(content.cost);
             $(record).find('button.create_order').attr('carId', content.id);
             $(record).find('button.create_order').click(function(sender){
                 let carId = $(this).attr('carId');
@@ -60,8 +60,8 @@ class car{
         $.get(url)
             .done(function(res){
                 self.menu.clearList();
-                self.fillListWithCar(res.content);
-                self.menu.pagination(res.info.current, res.info.pages);
+                self.fillListWithCar(res.content.cars);
+                self.menu.pagination(res.content.info.current, res.content.info.pages);
             })
             .fail(function(res){
                 self.menu.clearList();
@@ -73,11 +73,9 @@ class car{
     
     updateCarInfo(record, info){
         const detail = $(record).find('.detail_info');
-        $(detail).find('span.door').text(info.Doors);
-        $(detail).find('span.person').text(info.Person);
-        $(detail).find('span.locationCity').text(info.Location.City);
-        $(detail).find('span.locationStreet').text(info.Location.Street);
-        $(detail).find('span.locationHouse').text(info.Location.House);
+        $(detail).find('span.door').text(info.doors);
+        $(detail).find('span.person').text(info.person);
+        $(detail).find('span.transmission').text(info.transmission);
         $(detail).removeClass('hidden');
     }
     

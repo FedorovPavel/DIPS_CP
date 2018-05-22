@@ -20,7 +20,7 @@ function addIdOrderToQueue(id) {
       
       ch.assertQueue(queue, {durable : false});
       ch.sendToQueue(queue, Buffer.from(id),{persistent : true});
-      console.log('Order ID : ' + id + ' push to queue [' + queue + ']');
+      // console.log('Order ID : ' + id + ' push to queue [' + queue + ']');
     });
     setTimeout(function() {conn.close()},500);
   });
@@ -34,7 +34,7 @@ function receiveIdOrderFromQueue(callback){
       ch.assertQueue(queue, {durable : false});
       ch.consume(queue, function(id){
         const _id = id.content.toString('utf-8');
-        console.log('pop order id: ' + _id + ' from queue ['+queue+']');
+        // console.log('pop order id: ' + _id + ' from queue ['+queue+']');
         callback(_id);
       }, {noAck : true});
       setTimeout(function(){
@@ -79,6 +79,12 @@ router.get('/auth', function(req, res, next){
   return res.status(302).redirect(url);
 });
 
+router.get('/registration', function(req, res, next) {
+  const authUrl = 'http://localhost:3001/auth/registration?';
+  const url = authUrl;
+  return res.status(302).redirect(url);
+});
+
 router.post('/authByToken', function(req, res ,next){
   let getToken = function getBearerToken(req){
     return req.headers.authorization.split(' ')[1];
@@ -118,6 +124,7 @@ router.get('/code', function(req, res, next){
 router.get('/catalog', function(req, res, next){
   let page  = validator.checkPageNumber(req.query.page);
   let count = validator.checkCountNumber(req.query.count);
+  const filters = getFilters(req);
   const dataContainer = {
     page : page,
     count : count
@@ -155,8 +162,8 @@ router.post('/orders/', function(req, res, next){
       };
       return statSender.sendInfoByDraftOrder(data);
     }
-    param.startDate = validator.ConvertStringToDate(req.body.startDate);
-    if (!param.startDate){
+    param.from = validator.ConvertStringToDate(req.body.from);
+    if (!param.from){
       res.status(400).send({status : 'Error', message : 'Bad request : Invalid start rent date'});
       const data = {
         status : 400,
@@ -165,8 +172,8 @@ router.post('/orders/', function(req, res, next){
       };
       return statSender.sendInfoByDraftOrder(data);
     }
-    param.endDate = validator.ConvertStringToDate(req.body.endDate);
-    if (!param.endDate){
+    param.to = validator.ConvertStringToDate(req.body.to);
+    if (!param.to){
       res.status(400).send({status : 'Error', message : 'Bad request : Invalid end rent date'});
       const data = {
         status : 400,
@@ -175,6 +182,8 @@ router.post('/orders/', function(req, res, next){
       };
       return statSender.sendInfoByDraftOrder(data);
     }
+    // param.cost = validator.checkCost(req.body.cost);
+    param.cost = 100;
     return bus.createOrder(param, function(err, status, response){
         res.status(status).send(response);
         const data = {
@@ -202,67 +211,7 @@ router.get('/orders/:order_id', function(req, res, next){
   });
 });
 
-//  Get orders(new version)
-/* router.get('/orders', function(req, res, next){
-  let page  = validator.checkPageNumber(req.query.page);
-  let count = validator.checkCountNumber(req.query.count);
-  bus.getOrders(page, count, function(err, status, orders){
-    if (err)
-      res.status(status).send(orders);
-    else {
-      let carId = [];
-      let billingId = [];
-      for (let I = 0; I < orders.length; I++){
-        if (carId.indexOf(orders[I].CarID) == -1)
-          carId.push(orders[I].CarID);
-        if (typeof(orders[I].BillingID) != 'undefined')
-          billingId.push(orders[I].BillingID);
-      }
-      bus.getCarsByIDs(carId,function(err, status, cars){
-        if (err){
-          for (let I = 0; I < orders.length; I++)
-            orders[I].CarID = "Неизвестно";
-        } else {
-          cars = Array.from(cars);
-          for (let I = 0; I < orders.length; I++){
-            const car = orders[I].CarID;
-            delete orders[I].CarID;
-            const index = cars.findIndex(function(elem, index, arr){
-              if (elem.id == car)
-                return index;
-              return false;
-            });
-            orders[I].Car = cars[index];
-          }
-        }
-        busGetBillingsIDs(billingId, function(err, status, billings){
-          if (err) {
-            for (let I = 0; I < orders.length; I++){
-              orders[I].BillingID = 'Неизвестно';
-            }
-          } else {
-            billings = Array.from(billings);
-            for (let I = 0; I < orders.length; I++) {
-              const billing = orders[I].BillingID;
-              delete orders[I].BillingID;
-              if (typeof(billing) != 'undefined'){
-                const index = billings.findIndex(function(elem, index, arr){
-                  if (elem.id == billing)
-                    return index;
-                  return false;
-                });
-                orders[I].Billing = billings[index];
-              }
-            }
-          }
-          res.status(200).send(orders);
-        });
-      });
-    }
-  });
-});*/
-
-//  Get orders(last version)
+//  Get orders
 router.get('/orders', function(req, res, next){
   return checkAuthAndGetUserInfo(req, res, function(info){
     let page  = validator.checkPageNumber(req.query.page);
@@ -276,56 +225,37 @@ router.get('/orders', function(req, res, next){
       if (err)
         return res.status(status).send(orders);
       else {
-        let _counter_to_ready_order = 0;
-        if (orders && orders.content.length > 0){
-          for (let I = 0; I < orders.content.length; I++){
-            const car_id = orders.content[I].CarID;
-            if (typeof(car_id) != 'undefined'){
-              const carData = { id : car_id };
-              bus.getCar(carData, function(err, status, car){
-                delete orders.content[I].CarID;
-                if (err){
-                  orders.content[I].Car = 'Неизвестно';
-                } else {
-                  if (car && status == 200){
-                    orders.content[I].Car = car;
-                  } else {
-                    orders.content[I].Car = 'Неизвестно';
-                  }
-                }
-                if (typeof(orders.content[I].BillingID) != 'undefined'){
-                  const billing_id = orders.content[I].BillingID;
-                  const billingData = {
-                    billing_id : billing_id,
-                    userId : info.id
-                  };
-                  bus.getBilling(billingData, function(err, status, billing){
-                    delete orders.content[I].BillingID;
-                    if (err){
-                      orders.content[I].Billing = 'Неизвестно';
-                    } else {
-                      if (billing && status == 200){
-                        orders.content[I].Billing = billing;
-                      } else {
-                        orders.content[I].Billing = 'Неизвестно';
-                      }
-                    }
-                    _counter_to_ready_order++;
-                    if (_counter_to_ready_order == orders.content.length){
-                      res.status(200).send(orders);
-                    }
-                  });
-                } else {
-                  _counter_to_ready_order++;
-                  if (_counter_to_ready_order == orders.content.length){
-                    res.status(200).send(orders);
-                  }
-                }
-              });
-            }else {
-              orders.content[I].Car='Неизвестно';
+        let carsIds = [];
+        if (orders && orders.content.orders.length > 0) {
+          for (let I = 0; I < orders.content.orders.length; I++){
+            const carId = orders.content.orders[I].carId;
+            if (carId != 'undefined' && carsIds.indexOf(carId) == -1){
+              carsIds.push(carId);
             }
           }
+          return bus.getCarList(carsIds.join(','), function(err, status, cars){
+            if (err){
+              for (let I = 0; I < orders.content.orders.length; I++) {
+                delete orders.content.orders[I].carId;
+                orders.content.orders[I].Car = 'Неизвестно';
+              }
+            }
+            let index;
+            let car;
+            carsIds = cars.map(function(val){
+              return val.id;
+            });
+            for (let I = 0; I < orders.content.orders.length; I++) {
+              index = carsIds.indexOf(orders.content.orders[I].carId);
+              if (index >= 0) {
+                orders.content.orders[I].Car = cars[index];
+              } else {
+                orders.content.orders[I].Car = 'Неизвестно';
+              }
+              delete orders.content.orders[I].carId;
+            }
+            return res.status(200).send(orders);
+          });
         } else {
           res.status(status).send(null);
         }
@@ -376,48 +306,17 @@ router.put('/orders/paid/:id', function(req, res, next){
     return bus.getOrder(checkData, function(err, status, pre_order){
       if (err)
         return res.status(status).send(pre_order);
-      if (pre_order && pre_order.Status == 'WaitForBilling'){
+      if (pre_order && pre_order.status == 'Confirm'){
         let transferData = {
-          orderId: oid,
+          order_id : oid,
           userId : info.id,
-          data : data
+          data: data
         };
-        return bus.createBilling(transferData, function(err, status, response){
+        return bus.orderPaid(transferData, function(err, status, response){
           if (err || status != 201)
             return res.status(status).send(response);
           if (response && status == 201){
-            const billing_id = response.id;
-            transferData = {
-              order_id : oid,
-              userId : info.id,
-              billing_id : billing_id
-            };
-            return bus.orderPaid(transferData, function(err, status, order){
-              if (err){
-                transferData = {
-                  userId : info.id,
-                  billing_id : billing_id
-                };
-                bus.revertBilling(transferData, function(err, status, revMsg){
-                  console.log('Request to revert billing with id: ' + billing_id + ' completed with status :' + status + ' and response : ' + revMsg.message);
-                });
-                let msg = (order) ? order : 'Sorry. Service is not available.';
-                msg += ' We return your money.';
-                return res.status(500).send(msg);
-              }
-              if (status == 200 && order){
-                return res.status(200).send({order: order, billing : response });
-              }
-              transferData = {
-                userId : info.id,
-                billing_id : billing_id
-              };
-              return bus.revertBilling(transferData, function(err, status, revMsg){
-                let msg = (order) ? order : 'Sorry. Service is not available.';
-                msg +=  'We return your money.';
-                return res.status(status).send(msg);
-              });
-            });
+            return res.status(status, send(response));
           }
         });
       } else {
@@ -443,65 +342,6 @@ router.put('/orders/complete/:id', function(req, res, next){
       } else {
         return res.status(status).send(response);
       }
-    });
-  });
-});
-
-/*
-router.post('/billings', function(req, res, next){
-  let data = {};
-  const paySystem = validator.checkPaySystem(req.body.paySystem);
-  if (typeof(paySystem) == 'undefined') {
-    res.status(400).send({status : 'Error', message : 'Bad request : PaySystem is undefined'});
-    return;
-  }
-  if (!paySystem){
-    res.status(400).send({status : 'Error', message : 'Bad request : Invalid PaySystem'});
-    return;
-  }
-  data.paySystem = paySystem;
-  const account = validator.checkAccount(req.body.account);
-  if (typeof(account)  == 'undefined') {
-    res.status(400).send({status : 'Error', message : 'Bad request : Account is undefined'});
-    return;
-  }
-  if (!account){
-    res.status(400).send({status : 'Error', message : 'Bad request : Invalid Account'});
-    return;
-  }
-  data.account = account;
-  const cost  = validator.checkCost(req.body.cost);
-  console.log(cost);
-  if (typeof(cost) == 'undefined'){
-    res.status(400).send({status : 'Error', message : 'Bad request : Cost is undefined'});
-    return;
-  }
-  if (!cost){
-    res.status(400).send({status : 'Error', message : 'Bad request : Invalid cost'});
-    return;
-  }
-  data.cost = cost;
-  bus.createBilling(data, function(err, status, response){
-    if (err)
-      return next(err);
-    else {
-      res.status(status).send(response);
-    }
-  });
-});
-*/
-
-router.get('/billings/:id', function(req, res, next){
-  return checkAuthAndGetUserInfo(req, res, function(info){
-    const bid = validator.checkID(req.params.id);
-    if (typeof(bid) == 'undefined')
-      return res.status(400).send({status : 'Error', message : 'Bad request : id is not valid'});
-    const data = {
-      userId : info.id,
-      billingId: bid
-    };
-    return bus.getBilling(data, function(err, status, response){
-      return res.status(status).send(response);
     });
   });
 });
@@ -536,4 +376,9 @@ function checkAuthAndGetUserInfo(req, res, callback){
       return res.status(status).send(response);
     return callback(response)
   });
+}
+
+function getFilters() {
+
+  return null;
 }

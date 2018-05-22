@@ -46,7 +46,7 @@ OrderSchema.statics.createOrder = function (objectInfo, callback) {
 				if (err)
 					return callback(err, null);
 				else {
-					return callback(null, result.toOFullbject());
+					return callback(null, result.toFullObject());
 				}
 			});
 		} else {
@@ -89,7 +89,7 @@ OrderSchema.statics.getOrders = function (userId, page = 0, count = 20, callback
 	}).skip(page * count).limit(count);
 };
 
-OrderSchema.statics.getOrder = function (uid, id, callback) {
+OrderSchema.statics.getOrder = function (id, uid, callback) {
 	return this.findOne({ _id: id, userId: uid }, function (err, result) {
 		if (err)
 			return callback(err, null);
@@ -217,12 +217,12 @@ const manager = new class {
 		return orderORM.getOrders(id, page, count, callback);
 	}
 
-	getOrder(id, callback) {
-		return orderORM.getOrder(id, callback);
+	getOrder(id, uid, callback) {
+		return orderORM.getOrder(id, uid, callback);
 	}
 
-	getCount(uid, id, callback) {
-		return orderORM.getCount(uid, id, callback);
+	getCount(uid, callback) {
+		return orderORM.getCount(id, callback);
 	}
 
 	createOrder(objectInfo, callback) {

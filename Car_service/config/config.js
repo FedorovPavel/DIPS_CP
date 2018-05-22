@@ -8,7 +8,7 @@ const config = {
     app: {
       name: 'car-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3004,
     db: 'mongodb://localhost/car-service-development'
   },
 
@@ -17,7 +17,7 @@ const config = {
     app: {
       name: 'car-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3004,
     db: 'mongodb://Tester:1111@ds111370.mlab.com:11370/mongodips'
   },
 
@@ -26,7 +26,7 @@ const config = {
     app: {
       name: 'car-service'
     },
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 3004,
     db: 'mongodb://admin:1111@ds014808.mlab.com:14808/pcar'
   }
 };

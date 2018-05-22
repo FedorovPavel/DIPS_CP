@@ -1,7 +1,9 @@
 const express   = require('express'),
       router    = express.Router(),
       validator = require('./../validator/login'),
-      passport  = require('./../logic/my-passport');
+      passport  = require('./../logic/my-passport'),
+      mongoose = require('mongoose'),
+      uuidv4 = require('uuid').v4;
 
 module.exports = (app) => {
   app.use('/auth', router);
@@ -14,6 +16,12 @@ router.get('/authorization', function(req, res, next){
     app_id        : req.query.app_id
   });
 });
+
+router.get('/registration', function(req, res, next) {
+  return res.render('reg', {
+    app_id: req.query.app_id
+  });
+})
 
 router.post('/login', function(req, res, next){
   const data = {
@@ -37,6 +45,31 @@ router.post('/login', function(req, res, next){
       return res.status(status).send(err);
     const fullUrl = data.redirect_uri + "?code=" + encodeURIComponent(result);
     return res.redirect(302, fullUrl);
+  });
+});
+
+router.post('/registration', function(req, res, next){
+  const data = {
+    appId         : validator.checkAvailability(req.body.app_id),
+    login         : req.body.login,
+    password      : req.body.password,
+    rpassword     : req.body.rpassword
+  };
+  if (!data.appId)
+    return res.status(401).send({status : "Error", message : "One of parametrs is undefined"});
+  if (!data.login || !data.password || !data.rpassword){
+    return res.status(401).render('auth',{
+      response_type : data.responseType,
+      redirect_uri : data.redirect_uri,
+      app_id : data.appId
+    });
+  }
+  return passport.createUser(data, 'user', function(err, status, result){
+    if (err)
+      return res.status(status).send(err);
+    return res.status(200).render('confirmReg',{
+      tokens: result
+    });
   });
 });
 
@@ -142,23 +175,24 @@ function AuthorizationByToken(req, res, next, service_scope){
   });
 }
 
-/*
-  router.get('/create', function(req, res, next){
-    let model = mongoose.model('User');
-    let user = new model({
-      login: 'moderator',
-      password : '4444'
-    });
-    user.save(function(err, nw_user){
-      if (err)
-        return res.send(err);
-      return res.send(nw_user);
-    });
-  let ClientModel = mongoose.model('Client');
-  var client = new ClientModel({ name: "OurService iOS client v1", clientId: "mobileV1", clientSecret:"abc123456" });
-    client.save(function(err, client) {
-        if(err) return log.error(err);
-        res.send(null);
-    });
-  });
-*/
+
+  // router.get('/create', function(req, res, next){
+  //   let model = mongoose.model('User');
+  //   let user = new model({
+  //     login: 'admin',
+  //     password : '1111',
+  //     role:'admin',
+  //     code: uuidv4()
+  //   });
+  //   user.save(function(err, nw_user){
+  //     if (err)
+  //       return res.send(err);
+  //     return res.send(nw_user);
+  //   });
+  // let ClientModel = mongoose.model('Client');
+  // var client = new ClientModel({ name: "OurService iOS client v1", clientId: "mobileV1", clientSecret:"abc123456" });
+  //   client.save(function(err, client) {
+  //       if(err) return log.error(err);
+  //       res.send(null);
+  //   });
+  // });

@@ -1,5 +1,6 @@
 const   basic       = require('basic-auth'),
-        strategy    = require('./../../config/passport-stategy');
+        strategy    = require('./../../config/passport-stategy'),
+        uuid        = require('uuid').v4;
 const basicType = /basic/i;
 const bearerType = /bearer/i;
 
@@ -68,7 +69,10 @@ module.exports = {
                 return callback('User not found', status);
             return callback(null, status, user);
         });
-    }   
+    },
+    createUser: function (info, role, callback) {
+
+    }
 }
 
 //  Проверка авторизации сервиса по Basic аутентификации

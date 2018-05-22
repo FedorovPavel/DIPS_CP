@@ -1,37 +1,84 @@
 div.navbar-wrapper {
-  background: #0288d1;
-  height: 100px;
-}
-div.navbar-wrapper div.logo img {
-  height: 60px;
-}
-div.navbar-wrapper div.name {
-  vertical-align: middle;
-  height: 60px;
-}
-div.navbar-wrapper div.name p {
-  margin-top: 12px;
-  font-size: 24px;
-  font-weight: 800;
-  font-style: italic;
-  text-decoration: underline;
-  color: #ffffff;
-}
-div.navbar-wrapper ul.nav {
-  margin: 7px 0px 0px 30px;
-}
-div.navbar-wrapper ul.nav li a {
-  font-size: 18px;
-  color: #ffffff;
-  background: #6699FF;
-}
-div.navbar-wrapper ul.nav li:hover a {
-  font-size: 18px;
-  color: #ffffff;
-  background: #527eff;
-}
-div.navbar-wrapper ul.nav li.active a {
-  font-size: 18px;
-  color: #353535;
   background: #eeeeee;
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.5);
+}
+div.navbar-wrapper div.row.line {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+div.navbar-wrapper div.row.line div.logo {
+  vertical-align: middle;
+  height: 40px;
+}
+div.navbar-wrapper div.row.line div.logo img {
+  height: 100%;
+  filter: invert(1);
+}
+div.navbar-wrapper div.row.line div.logo p {
+  margin-left: 10px;
+  font-size: 24px;
+  font-weight: 1000;
+  font-style: italic;
+  font-family: 'Times New Roman', Times, serif;
+  text-decoration: underline;
+  color: #353535;
+  display: inline-block;
+}
+div.navbar-wrapper div.row.line ul.nav {
+  height: 35px;
+  margin: 10px 0px 10px 30px;
+}
+div.navbar-wrapper div.row.line ul.nav li {
+  transition-delay: 0ms;
+  transition-duration: 350ms;
+  transition-timing-function: ease;
+  transition-property: border;
+  margin-right: 30px;
+  cursor: pointer;
+}
+div.navbar-wrapper div.row.line ul.nav li span {
+  transition-delay: 0ms;
+  transition-duration: 1350ms;
+  transition-timing-function: ease;
+  transition-property: font-size;
+  font-size: 18px;
+  font-family: 'Times New Roman', Times, serif;
+  color: #ff9100;
+}
+div.navbar-wrapper div.row.line ul.nav li:hover {
+  border-bottom: 3px solid #ff4900;
+}
+div.navbar-wrapper div.row.line ul.nav li.active {
+  border-bottom: 3px solid #ff4900;
+}
+div.navbar-wrapper div.row.line ul.nav li.active span {
+  color: #ff4900;
+}
+div.navbar-wrapper div.row.line button.button {
+  border-radius: 5px;
+  border: none;
+}
+div.navbar-wrapper div.row.line button.auth-button {
+  padding: 5px 10px;
+  margin: 0px 35px;
+  width: calc(100% - 70px);
+  font-family: 'Times New Roman', Times, serif;
+  background: #29c230;
+  overflow: hidden;
+  outline: none;
+  color: #ffffff;
+}
+div.navbar-wrapper div.row.line button.reg-button {
+  padding: 2px 10px;
+  margin: 0px 35px;
+  width: calc(100% - 70px);
+  font-family: 'Times New Roman', Times, serif;
+  text-decoration: underline;
+  font-size: 12px;
+  background: inherit;
+  overflow: hidden;
+  outline: none;
+  color: #353535;
 }

@@ -24,7 +24,7 @@ router.get('/', function (req, res, next) {
 					if (err)
 						return res.status(500).send(responseTemplate('Error', err, scope));
 					let data = {
-						content: orders,
+						orders: orders,
 						info: {
 							count: countRecord,
 							pages: Math.ceil(countRecord / count) - 1,
@@ -44,7 +44,7 @@ router.get('/:id', function (req, res, next) {
 	return passport.checkServiceAuthorization(req, res, function(scope){
 		const uid = getUserId(req);
 		const id = req.params.id;
-		return orderManager.getOrder(uid, id, function (err, order) {
+		return orderManager.getOrder(id, uid, function (err, order) {
 			if (err) {
 				if (err.kind == 'ObjectId')
 					return res.status(400).send(responseTemplate('Error', { message: 'Bad request : Invalid ID' }, scope));

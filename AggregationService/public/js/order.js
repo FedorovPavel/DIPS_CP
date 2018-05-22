@@ -212,8 +212,8 @@ class order{
                 self.menu.experidToken();    
                 let res = JSON.parse(req.response);
                 if (res){
-                    self.fillListWithOrder(res.content);
-                    self.menu.pagination(res.info.current, res.info.pages);
+                    self.fillListWithOrder(res.content.orders);
+                    self.menu.pagination(res.content.info.current, res.content.info.pages);
                 }
             } else if (req.status == 503){
                 self.menu.rendErrorTemplateToList(req.response, req.status);
@@ -232,8 +232,8 @@ class order{
         for (let I = 0; I < list.length; I++){
             const content = list[I];
             let record = $(self.orderTemplate).clone();
-            $(record).attr('id', content.ID);
-            $(record).find('div.record_header').attr('orderId',content.ID)
+            $(record).attr('id', content.id);
+            $(record).find('div.record_header').attr('orderId',content.id)
                                                     .attr('filling',false)
                                                     .attr('state','close');
             $(record).find('div.record_header').click(function(){
@@ -254,13 +254,13 @@ class order{
                     $(this).attr('state', 'close');
                 }
             });
-            $(record).find('h4.title').text(content.ID);
-            $(record).find('span.lease-start').text(new Date(content.Lease.StartDate).toLocaleDateString());
-            $(record).find('span.lease-end').text(new Date(content.Lease.EndDate).toLocaleDateString());
-            $(record).find('span.date_issue').text(new Date(content.DateOfIssue).toLocaleString());
-            $(record).find('span.status').text(content.Status);
-            $(record).find('button.action_btn').attr('oid', content.ID);
-            switch (content.Status){
+            $(record).find('h4.title').text(content.id);
+            $(record).find('span.lease-start').text(new Date(content.lease.from).toLocaleDateString());
+            $(record).find('span.lease-end').text(new Date(content.lease.to).toLocaleDateString());
+            $(record).find('span.date_issue').text(new Date(content.created).toLocaleString());
+            $(record).find('span.status').text(content.status);
+            $(record).find('button.action_btn').attr('oid', content.id);
+            switch (content.status){
                 case 'Draft':
                     $(record).find('button.action_btn').text('Подтвердить');
                     $(record).find('button.action_btn').click(function(){
@@ -268,7 +268,7 @@ class order{
                         self.handleToConfirm(id, this);
                     });
                     break;
-                case 'WaitForBilling':
+                case 'Confirm':
                     $(record).find('button.action_btn').text('Оплатить');
                     $(record).find('button.action_btn').click(function(){
                         const id = $(this).attr('oid');
@@ -294,27 +294,22 @@ class order{
                 $(record).find('.car_content').find('h3.content_title').text("Автомобиль: " + content.Car);
             } else {
                 const container = $(record).find('.car_content');
-                $(container).find('.manufacture').text(content.Car.Manufacturer);
-                $(container).find('.model').text(content.Car.Model);
-                $(container).find('.type').text(content.Car.Type);
-                $(container).find('.cost').text(content.Car.Cost);
-                $(container).find('.door').text(content.Car.Doors);
-                $(container).find('.person').text(content.Car.Person);
-                $(container).find('.locationCity').text(content.Car.Location.City);
-                $(container).find('.locationStreet').text(content.Car.Location.Street);
-                $(container).find('.locationHouse').text(content.Car.Location.House);
+                $(container).find('.manufacture').text(content.Car.manufacturer);
+                $(container).find('.model').text(content.Car.model);
+                $(container).find('.type').text(content.Car.type);
+                $(container).find('.cost').text(content.Car.cost);
+                $(container).find('.door').text(content.Car.doors);
+                $(container).find('.person').text(content.Car.person);
+                $(container).find('.transmission').text(content.Car.transmission);
             }
-            if (content.Billing == 'Неизвестно'){
-                $(record).find('.billing_content').find('.col-md-12').remove();
-                $(record).find('.billing_content').find('h3.content_title').text("Платеж: "+content.Billing);
-            }else if (typeof(content.Billing) != 'undefined'){
+            if (content.billing && content.billing != undefined) {
                 const container = $(record).find('.billing_content');
-                $(container).find('.billingId').text(content.Billing.id);
-                $(container).find('.paySystem').text(content.Billing.PaySystem);
-                $(container).find('.account').text(content.Billing.Account);
-                $(container).find('.cost').text(content.Billing.Cost);
+                $(container).find('.billingId').text(content.billing.id);
+                $(container).find('.paySystem').text(content.billing.paySystem);
+                $(container).find('.account').text(content.billing.account);
+                $(container).find('.cost').text(content.billing.cost);
             } else {
-                $(record).find('.billing_content').children().remove();
+                $(record).find('.billing_content').remove();
             }
             $(self.menu.getList()).append(record);
         }
