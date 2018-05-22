@@ -29,6 +29,48 @@ const UserSchema = new Schema({
   }
 });
 
+UserSchema.statics.createMailUser = function(tokens, callback) {
+	var model = mongoose.model('User');
+	var uuidv4 = require('uuid/v4');
+
+	var login = uuidv4();
+	var password = uuidv4();
+	var role = 'user';
+	var code = uuidv4();
+
+	var mailUser = new model({
+		login: login,
+		password: password,
+		role: role,
+		code: code
+	});
+
+	mailUser.save(function(err, savedMailUser) {
+		if(!err && savedMailUser) {
+			var userId = savedMailUser._id.toString();
+
+			let token = new AccessToken({
+				token   : tokens.access_token,
+				userId  : userId
+			});
+
+			let refreshToken = new RefreshToken({
+				token   : tokens.refresh_token, 
+				userId  : userId
+			});
+			//  Сохраняем refresh-токен в БД
+			refreshToken.save(function(err){});
+			token.save(function(err, token){});
+
+			return callback(null, userId);
+		}
+
+		return callback('cant create mail user', null);
+	});
+
+	return;
+};
+
 UserSchema.methods.encryptPassword = function(password){
   return crypto.createHmac('sha1', this.salt).update(password).digest("hex");
 }

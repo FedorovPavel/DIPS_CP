@@ -67,7 +67,43 @@ module.exports = {
             });
         }
         return main_function(info, callback);
-    },
+	},
+	getMailToken : function(info, callback) {
+		let main_function = function(info, callback){
+			const url = 'https://connect.mail.ru/oauth/token';
+			const options = createOptions(url, "POST", AuthToken);
+			const data = {
+				client_id: config.mailApp.id,
+				client_secret: config.mailApp.secret,
+				grant_type: 'authorization_code',
+				code: info.code,
+				redirect_uri: 'http://localhost:3000/aggregator/code'
+			};
+
+			return createAndSendHttpPostRequest(options, data, function(err, status, response){
+				return responseHandlerObject(err, status, response, function(err, status, response){
+					const repeat = checkMailServicesInformationFromAuth(status, response, main_function, info, callback);
+					if (!repeat)
+						return callback(err, status, response);
+					return;
+				});
+			});
+		}
+	},
+	saveMailTokensToAuth : function(tokens) {
+		let main_function = function(info, callback){
+			const url = _AuthHost + '/auth/saveMailTokens';
+            const options = createOptions(url, 'POST', AuthToken);
+            const data = tokens;
+            return createAndSendHttpPostRequest(options, data, function(err, status, response){
+                return responseHandlerObject(err, status, response, function(err, status, response){
+                    const repeat = checkServicesInformationFromAuth(status, response, main_function, info, callback);
+                    return;
+                });                
+            });
+        }
+	},
+
     //  Catalog methods
     getCars: function (dataContainer, callback) {
         let main_function = function(data, callback){
@@ -394,6 +430,15 @@ function checkServicesInformationFromAuth(status, response, method, info, callba
         delete response.service;
     }
     return false;
+}
+
+function checkMailServicesInformationFromAuth(status, response, method, info, callback){
+    if (status != 200){
+        method(info, callback);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function checkServicesInformationFromCatalog(status, response, method, info, callback){
