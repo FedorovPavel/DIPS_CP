@@ -6,28 +6,43 @@ div.absolute-position {
   bottom: 0%;
   background: rgba(0, 0, 0, 0.5);
 }
-div.absolute-position .error_content {
+div.error-container {
+  height: 100%;
+  position: relative;
+}
+div.error-container .error_content {
   position: absolute;
   left: 20%;
   right: 20%;
   top: 20%;
   bottom: 20%;
+  height: 60%;
+  width: 60%;
   background: #ffffff;
   border-radius: 20px;
+  overflow: hidden;
 }
-div.absolute-position .error_content h2 {
+div.error-container .error_content h2 {
   font-family: Arial, Helvetica, sans-serif;
   color: #353535;
   font-weight: 1000;
 }
-div.absolute-position .error_content span.status_code {
+div.error-container .error_content span.status_code {
   color: #ff0000;
 }
-div.absolute-position .error_content span.error_msg {
+div.error-container .error_content span.error_msg {
   color: #353535;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 700;
   font-size: 14px;
+}
+div.error-container .error_content.list {
+  position: relative;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  width: 100%;
 }
 div.hidden {
   display: none;

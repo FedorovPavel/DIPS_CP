@@ -1,12 +1,9 @@
-class order{
+var orderManager = new class order{
     constructor(menu){
         this.menu       = menu;
         this.orderTemplate  = null;
         this.draftTemplate  = null;
         this.paidTemplate   = null;
-        this.getOrderTemplate();
-        this.getDraftTemplate();
-        this.getPaidTemplate();
         this.paidOperation = false;
     }
 
@@ -366,4 +363,10 @@ class order{
             self.sendPaidInfo(id, JSON.stringify(data), sender);
         });
     }
-}
+}();
+
+$(document).ready(function() {
+    orderManager.getOrderTemplate();
+    orderManager.getDraftTemplate();
+    orderManager.getPaidTemplate();
+});

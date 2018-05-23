@@ -1,20 +1,16 @@
-var Menu;
-class menu {
+var menuTab = {
+    catalog: 0,
+    orders: 1,
+}
+var menuManager = new class menu {
     constructor(){
-        this.car            = new car(this);
-        this.order          = new order(this);
         this.errorTemplate  = null;
         this.lastCount      = 20;
         this.page           = 0;
         this.pages;
         this.count          = 20;
         this.draftExecution = false;
-        this.openTabs       = 'catalog';
-        this.getErrorTemplate();
-        this.getReportsTemplate();
-        this.bindHandleToHeader();
-        this.recordCounter();
-        this.changePager();
+        this.openTabs       = menuTab.catalog;
         this.token = null;
         this.refreshToken = null;
         this.tokenTimer = null;
@@ -24,7 +20,7 @@ class menu {
     //  Получение шаблона для вывода ошибок
     getErrorTemplate(){
         let self = this;
-        self.errorTemplate = $('div#error_template').clone();
+        self.errorTemplate = $('div#error-template').clone();
         $(self.errorTemplate).removeClass('hidden');
         $('div#error-template').remove();
         $(self.errorTemplate).removeAttr('id');
@@ -35,9 +31,11 @@ class menu {
         let self = this;
         self.reportTemplate = $('div#report_template').clone();
         $('div#report_template').remove();
+        $(self.reportTemplate).removeClass('hidden');
         $(self.reportTemplate).removeAttr('id');
         return;
     }
+
     //  Отображение template
     rendErrorTemplate(err_msg, err_status){
         var self = this;
@@ -60,6 +58,7 @@ class menu {
         $(template).find('span.status_code').text(err_status);
         $(template).find('span.error_msg').text(err_msg);
         $(template).removeClass('absolute-position');
+        $(template).find('.error_content').addClass('list');
         $(self.getList()).append(template);
         return;
     }
@@ -153,33 +152,37 @@ class menu {
         const cars      = menuPills.find('li#automobile-pill');
         const orders    = menuPills.find('li#orders-pill');
         const report    = menuPills.find('li#report-pill');
-        const auth      = $('button#auth_submit').click(function(){
+        $('button#auth_submit').click(function() {
             self.authUser();
         });
+        $('button#reg_submit').click(function() {
+            self.regUser();
+        });
         $(cars).click(function(){
-            $(menuPills).find('li').removeClass('active');
-            $(this).addClass('active');
-            self.openTabs = 'catalog';
-            self.page = 0;
-            self.recordCounter();
-            self.changePager(); 
-            self.draftExecution = false;
+            if (self.openTabs != menuTab.catalog) {
+                self.openTabs = menuTab.catalog;
+                $(menuPills).find('li').removeClass('active');
+                $(this).addClass('active');
+                self.page = 0;
+                self.changePager(); 
+                self.draftExecution = false;
+            }
         });
         $(orders).click(function(){
-            $(menuPills).find('li').removeClass('active');
-            $(this).addClass('active');
-            self.openTabs = 'order';
-            self.page = 0;
-            self.recordCounter();            
-            self.changePager(); 
-            self.draftExecution = false;
+            if (self.openTabs != menuTab.orders) {
+                self.openTabs = menuTab.orders;
+                $(menuPills).find('li').removeClass('active');
+                $(this).addClass('active');
+                self.page = 0;      
+                self.changePager(); 
+                self.draftExecution = false;
+            }
         });
         $(report).click(function(){
             $(menuPills).find('li').removeClass('active');
             $(this).addClass('active');
             self.openTabs = 'report';
-            self.page = 0;
-            self.recordCounter();            
+            self.page = 0;            
             self.changePager(); 
             self.draftExecution = false;
         });
@@ -192,7 +195,6 @@ class menu {
             self.page = 0;
             self.lastCount = self.count;
             self.count = Number(this.value);
-            self.changePager();    
         });
     }
 
@@ -220,44 +222,53 @@ class menu {
     }
 
     //  Обработчик для указателя на следующую страницу
-    handleNextPage(method, bind){
+    handleNextPage(method){
         this.page++;
-        method(this.page, this.count, bind);
+        method(this.page, this.count);
         return;
     }
 
     //  Обработчик для указателя на предыдующую страницу
-    handlePrevPage(method, bind){
+    handlePrevPage(method){
         this.page--;
-        method(this.page, this.count, bind);
+        method(this.page, this.count);
         return;
     }
 
     //  Изменение контента листа
     changePager(){
         let self = this;
-        let list = self.openTabs;
-        const mainPager = $('ul#pager');
-        const prev = $(mainPager).find('li.previous')[0];
-        const next = $(mainPager).find('li.next')[0];
-        $(prev).unbind('click');
-        $(next).unbind('click');
-        switch (list){
-            case 'catalog':
-                $(prev).click(function(){ self.handlePrevPage(self.car.getCars, self.car)});
-                $(next).click(function(){ self.handleNextPage(self.car.getCars, self.car)});
-                self.car.getCars(self.page, self.count, self.car);
+        let type = self.openTabs;
+        rebindPager();
+        switch (type){
+            case menuTab.catalog:
+                bindPager(carManager.getCars);
                 break;
-            case 'order':
-                $(prev).click(function(){ self.handlePrevPage(self.order.getOrders, self.order)});
-                $(next).click(function(){ self.handleNextPage(self.order.getOrders, self.order)});
-                self.order.getOrders(self.page, self.count, self.order);
+            case menuTab.orders:
+                bindPager(orderManager.getOrders);
                 break;
             case 'report':
                 self.getReports();
                 break;
         }
         return;
+
+        function rebindPager() {
+            const mainPager = $('ul#pager');
+            const prev = $(mainPager).find('li.previous')[0];
+            const next = $(mainPager).find('li.next')[0];
+            $(prev).unbind('click');
+            $(next).unbind('click');
+        }
+        
+        function bindPager(method) {
+            const mainPager = $('ul#pager');
+            const prev = $(mainPager).find('li.previous')[0];
+            const next = $(mainPager).find('li.next')[0];
+            $(prev).click(function(){ self.handlePrevPage(method)});
+            $(next).click(function(){ self.handleNextPage(method)});
+            method(self.page, self.count);
+        }
     }
 
     //  Заполнить Draft панель
@@ -423,7 +434,7 @@ class menu {
 
     createDraftOrder(car){
         if (!this.draftExecution){
-            let panel = $(this.order.draftTemplate).clone();
+            let panel = $(orderManager.draftTemplate).clone();
             this.fillDraftPanel(panel, car);
             this.draftExecution = true;
             $('body').append(panel);
@@ -445,6 +456,38 @@ class menu {
         frame.sandbox.add("allow-scripts");
         frame.sandbox.add("allow-top-navigation");
         frame.src = 'http://localhost:3000/aggregator/auth';
+        $('body').append(frame);
+        frame.onload = function(){
+            frame.style.display = 'none';
+            let url = "";
+            try{
+                url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
+            } catch(err){
+                frame.style.display = 'block';
+            }
+            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            if (check.test(url)){
+                let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
+                self.token = res.access_token;
+                self.refreshToken = res.refresh_token;
+                $(frame).remove();
+            } else {
+                frame.style.display = 'block';
+            }
+        }
+    }
+
+    regUser() {
+        let self = this;
+        let frame = document.createElement('iframe');
+        frame.id = 'reg';
+        frame.sandbox.add("allow-forms");
+        frame.sandbox.add("allow-pointer-lock");
+        frame.sandbox.add("allow-popups");
+        frame.sandbox.add("allow-same-origin");
+        frame.sandbox.add("allow-scripts");
+        frame.sandbox.add("allow-top-navigation");
+        frame.src = 'http://localhost:3000/aggregator/registration';
         $('body').append(frame);
         frame.onload = function(){
             frame.style.display = 'none';
@@ -494,7 +537,7 @@ class menu {
         clearTimeout(self.tokenTimer);
         self.tokenTimer = setTimeout(function(){
             self.token = null;
-        }, 10000);
+        }, 1000000);
     }
 
     fillReports(content){
@@ -566,8 +609,12 @@ class menu {
         }
         req.send();
     }
-};
+}();
 
 $(document).ready(function(){
-    Menu = new menu();
+    menuManager.getErrorTemplate();
+    menuManager.getReportsTemplate();
+    menuManager.bindHandleToHeader();
+    menuManager.recordCounter();
+    menuManager.changePager();
 });

@@ -34,6 +34,14 @@ div.car_container div.main_info span.head_label {
   font-size: 18px;
   font-weight: 700;
 }
+div.car_container div.detail_info {
+  height: auto;
+  transition-duration: 2500ms;
+  transition-property: all;
+  transition-delay: 0ms;
+  transition-timing-function: ease;
+  overflow: hidden;
+}
 div.car_container div.detail_info span {
   font-size: 15px;
 }
@@ -50,4 +58,7 @@ div.car_container div.detail_info button.create_order {
 div.car_container div.detail_info button.create_order:hover {
   background: #6699FF;
   color: #353535;
+}
+div.car_container div.detail_info.hidden-detail {
+  height: 0px;
 }

@@ -1,14 +1,13 @@
-class car{
+var carManager = new class car{
     constructor(refToMenu){
-        this.menu = refToMenu;
         this.template = null;
-        this.getCarTemplate();
     }
 
     getCarTemplate(){
         let self = this;
         self.template = $('div#car_template').clone();
         $('div#car_template').remove();
+        $(self.template).removeClass('hidden');
         $(self.template).removeAttr('id');
         return;
     }
@@ -28,7 +27,7 @@ class car{
                         self.getCar($(this).attr('carId'), this);
                         $(this).attr('filling', true);
                     } else {
-                        $(record).find('.detail_info').removeClass('hidden');
+                        $(record).find('.detail_info').removeClass('hidden-detail');
                     }
                     $(this).find('.view_detail_info').removeClass('glyphicon-chevron-down');
                     $(this).find('.view_detail_info').addClass('glyphicon-chevron-up');
@@ -36,47 +35,47 @@ class car{
                 } else {
                     $(this).find('.view_detail_info').removeClass('glyphicon-chevron-up');
                     $(this).find('.view_detail_info').addClass('glyphicon-chevron-down');
-                    $(record).find('.detail_info').addClass('hidden');
+                    $(record).find('.detail_info').addClass('hidden-detail');
                     $(this).attr('state', 'close');
                 }
             });
             $(record).find('h4.title').text(content.manufacture + ' ' + content.model);
             $(record).find('span.manufacture').text(content.manufacture);
             $(record).find('span.model').text(content.model);
-            $(record).find('span.type').text(content.type);
-            $(record).find('span.cost').text(content.cost);
+            $(record).find('span.type').text(getRuCarType(content.type));
+            $(record).find('span.cost').text(content.cost + ' руб./д.');
             $(record).find('button.create_order').attr('carId', content.id);
             $(record).find('button.create_order').click(function(sender){
                 let carId = $(this).attr('carId');
-                self.menu.createDraftOrder(content);
+                menuManager.createDraftOrder(content);
             });
-            $(self.menu.getList()).append(record);
+            $(menuManager.getList()).append(record);
         }
     }
     
-    getCars(page, count, bind) {
-        let self = bind;
+    getCars(page, count) {
+        let self = carManager;
         const url = '/aggregator/catalog?page=' + page + '&count=' + count;
         $.get(url)
             .done(function(res){
-                self.menu.clearList();
+                menuManager.clearList();
                 self.fillListWithCar(res.content.cars);
-                self.menu.pagination(res.content.info.current, res.content.info.pages);
+                menuManager.pagination(res.content.info.current, res.content.info.pages);
             })
             .fail(function(res){
-                self.menu.clearList();
-                self.menu.page = 0;
-                self.menu.rendErrorTemplateToList(res.responseText, res.status);
-                self.menu.pagination(0,0);
-            })
+                menuManager.clearList();
+                menuManager.page = 0;
+                menuManager.rendErrorTemplateToList(res.responseText, res.status);
+                menuManager.pagination(0,0);
+            });
     }
     
     updateCarInfo(record, info){
         const detail = $(record).find('.detail_info');
         $(detail).find('span.door').text(info.doors);
         $(detail).find('span.person').text(info.person);
-        $(detail).find('span.transmission').text(info.transmission);
-        $(detail).removeClass('hidden');
+        $(detail).find('span.transmission').text(getRuTransmissonType(info.transmission));
+        $(detail).removeClass('hidden-detail');
     }
     
     getCar(id, sender) {
@@ -90,8 +89,47 @@ class car{
             self.updateCarInfo(record, res);
         })
         .fail(function(res){
-            self.menu.rendErrorTemplate(res.responseText, res.status);
+            menuManager.rendErrorTemplate(res.responseText, res.status);
             $(sender).attr('filling','false');
         });
+    }
+}();
+
+$(document).ready(function() {
+    carManager.getCarTemplate();
+});
+
+function getRuCarType(type) {
+    switch(type) {
+        case 'sedan':
+            return 'Седан';
+        case 'hatchback':
+            return 'Хечбек'
+        case 'SUV':
+            return 'Внедорожник';
+        case 'wagon':
+            return 'Универсал';
+        case 'van':
+            return 'Фургон';
+        case 'coupe':
+            return 'Купе';
+        case 'minivan':
+            return 'Минивен';
+        case 'other':
+        default: 
+            return 'Другое';
+    }
+}
+
+function getRuTransmissonType(type) {
+    switch (type){
+        case 'auto':
+            return 'Автоматическая';
+        case 'manual':
+            return 'Механическая';
+        case 'robot':
+            return 'Роботизированная';
+        default:
+            return '';
     }
 }

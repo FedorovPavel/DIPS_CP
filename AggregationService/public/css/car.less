@@ -41,6 +41,12 @@ div.car_container{
         }
     }
     div.detail_info{
+        height: auto;
+        transition-duration: 2500ms;
+        transition-property: all;
+        transition-delay: 0ms;
+        transition-timing-function: ease;
+        overflow: hidden;
         span{
             font-size: 15px;
         }
@@ -58,5 +64,8 @@ div.car_container{
             background: @button-color-hover;
             color: @dark-text;
         }
+    }
+    div.detail_info.hidden-detail{
+        height: 0px;
     }
 }
