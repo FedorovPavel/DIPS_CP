@@ -8,13 +8,27 @@ div.absolute-position {
 }
 div.absolute-position .error_content {
   position: absolute;
-  left: 15%;
-  right: 15%;
-  top: 15%;
-  bottom: 15%;
+  left: 20%;
+  right: 20%;
+  top: 20%;
+  bottom: 20%;
   background: #ffffff;
+  border-radius: 20px;
 }
-.error_container .error_content {
-  background: #ffffff;
-  color: #000000;
+div.absolute-position .error_content h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #353535;
+  font-weight: 1000;
+}
+div.absolute-position .error_content span.status_code {
+  color: #ff0000;
+}
+div.absolute-position .error_content span.error_msg {
+  color: #353535;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+div.hidden {
+  display: none;
 }

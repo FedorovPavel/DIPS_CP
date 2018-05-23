@@ -25,7 +25,8 @@ class menu {
     getErrorTemplate(){
         let self = this;
         self.errorTemplate = $('div#error_template').clone();
-        $('div#error_template').remove();
+        $(self.errorTemplate).removeClass('hidden');
+        $('div#error-template').remove();
         $(self.errorTemplate).removeAttr('id');
         return;
     }

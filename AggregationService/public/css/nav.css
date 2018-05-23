@@ -45,16 +45,19 @@ div.navbar-wrapper div.row.line ul.nav li span {
   transition-property: font-size;
   font-size: 18px;
   font-family: 'Times New Roman', Times, serif;
-  color: #ff9100;
+  color: #353535;
 }
 div.navbar-wrapper div.row.line ul.nav li:hover {
-  border-bottom: 3px solid #ff4900;
+  border-bottom: 3px solid #606060;
 }
 div.navbar-wrapper div.row.line ul.nav li.active {
-  border-bottom: 3px solid #ff4900;
+  border-bottom: 3px solid #606060;
 }
 div.navbar-wrapper div.row.line ul.nav li.active span {
-  color: #ff4900;
+  color: #606060;
+}
+div.navbar-wrapper div.row.line ul.nav li.hidden {
+  display: none;
 }
 div.navbar-wrapper div.row.line button.button {
   border-radius: 5px;
@@ -62,8 +65,7 @@ div.navbar-wrapper div.row.line button.button {
 }
 div.navbar-wrapper div.row.line button.auth-button {
   padding: 5px 10px;
-  margin: 0px 35px;
-  width: calc(100% - 70px);
+  width: 100%;
   font-family: 'Times New Roman', Times, serif;
   background: #29c230;
   overflow: hidden;
@@ -72,8 +74,7 @@ div.navbar-wrapper div.row.line button.auth-button {
 }
 div.navbar-wrapper div.row.line button.reg-button {
   padding: 2px 10px;
-  margin: 0px 35px;
-  width: calc(100% - 70px);
+  width: 100%;
   font-family: 'Times New Roman', Times, serif;
   text-decoration: underline;
   font-size: 12px;

@@ -64,6 +64,9 @@ div.navbar-wrapper{
                     color: @menu-field-hover;
                 }
             }
+            li.hidden{
+                display: none;
+            }
         }
         button.button{
             border-radius: 5px;
@@ -72,8 +75,7 @@ div.navbar-wrapper{
         button.auth-button{
             // height: 20px;
             padding: 5px 10px;
-            margin: 0px 35px;
-            width: ~'calc(100% - 70px)';
+            width: 100%;
             font-family: 'Times New Roman', Times, serif;
             background: @auth-color;
             overflow: hidden;
@@ -83,8 +85,7 @@ div.navbar-wrapper{
         button.reg-button{
             // height: 20px;
             padding: 2px 10px;
-            margin: 0px 35px;
-            width: ~'calc(100% - 70px)';
+            width: 100%;
             font-family: 'Times New Roman', Times, serif;
             text-decoration: underline;
             font-size: 12px;

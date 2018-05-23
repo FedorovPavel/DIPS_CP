@@ -1,19 +1,40 @@
 div.footer {
-  background: #0288d1;
+  background: #eeeeee;
   width: 100%;
-  padding: 20px;
+  padding: 10px 20px;
 }
 div.footer span.project {
   margin-left: 30px;
   font-size: 20px;
-  color: #ffffff;
+  color: #595959;
   font-weight: 600;
   font-style: italic;
 }
-div.footer span.author {
+div.footer div.programers {
+  text-align: center;
+}
+div.footer div.programers div.authors {
+  display: inline-block;
+}
+div.footer div.programers div.authors span.author {
   margin-right: 30px;
-  font-size: 16px;
-  color: #ffffff;
+  font-size: 12px;
+  color: #595959;
+  font-weight: 600;
+  font-style: italic;
+}
+div.footer div.copyright {
+  text-align: center;
+}
+div.footer div.copyright i {
+  font-size: 10px;
+  font-weight: 600;
+  font-style: italic;
+  margin-right: 5px;
+}
+div.footer div.copyright span {
+  font-size: 10px;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 600;
   font-style: italic;
 }

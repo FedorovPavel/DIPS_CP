@@ -1,5 +1,5 @@
 div.content-field {
-  min-height: calc(100vh - 60px - 88px);
+  min-height: calc(100vh - 55px - 80px);
   overflow: hidden;
 }
 div.content-field .row {

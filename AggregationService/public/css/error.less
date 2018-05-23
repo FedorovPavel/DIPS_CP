@@ -1,3 +1,6 @@
+@menu-field-hover   : #606060;
+@dark-text          : #353535;
+
 div.absolute-position{
     position: fixed;
     left: 0%;
@@ -7,17 +10,28 @@ div.absolute-position{
     background: rgba(0,0,0,0.5);
     .error_content{
         position: absolute;
-        left: 15%;
-        right: 15%;
-        top:15%;
-        bottom: 15%;
+        left: 20%;
+        right: 20%;
+        top:20%;
+        bottom: 20%;
         background: #ffffff;
+        border-radius: 20px;
+        h2 {
+            font-family: Arial, Helvetica, sans-serif;
+            color: @dark-text;
+            font-weight: 1000;
+        }
+        span.status_code{
+            color: #ff0000;
+        }
+        span.error_msg{
+            color: @dark-text;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
     }
 }
-
-.error_container{
-    .error_content{
-        background: #ffffff;
-        color : #000000;
-    }
+div.hidden{
+    display: none;
 }

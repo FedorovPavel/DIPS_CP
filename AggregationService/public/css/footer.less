@@ -1,10 +1,10 @@
-@main-color         : #0288d1;
-@light-text         : #ffffff;
+@main-color         : #eeeeee;
+@light-text         : #595959;
 
 div.footer{
     background: @main-color;
     width: 100%;
-    padding: 20px;
+    padding: 10px 20px;
     span.project{
         margin-left: 30px;
         font-size: 20px;
@@ -12,11 +12,32 @@ div.footer{
         font-weight: 600;
         font-style: italic;
     }   
-    span.author{
-        margin-right: 30px;
-        font-size: 16px;
-        color : @light-text;
-        font-weight: 600;
-        font-style: italic;
+    div.programers{
+        text-align: center;
+        div.authors{
+            display: inline-block;
+            span.author{
+                margin-right: 30px;
+                font-size: 12px;
+                color : @light-text;
+                font-weight: 600;
+                font-style: italic;
+            }
+        }
+    }
+    div.copyright{
+        text-align: center;
+        i{
+            font-size: 10px;
+            font-weight: 600;
+            font-style: italic;
+            margin-right: 5px;
+        }
+        span{
+            font-size: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 600;
+            font-style: italic;
+        }
     }
 }

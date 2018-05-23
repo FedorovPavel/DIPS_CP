@@ -8,10 +8,13 @@ div.navbar-wrapper
                 ul#nav-pills.nav.nav-pills
                     li#automobile-pill.active 
                         span Автомобили
-                    li#orders-pill 
+                    li#orders-pill.disable 
                         span Заказы
-                    li#report-pill
+                    li#report-pill.hidden
                         span Отчеты
             div.col-xs-2
-                button#auth_submit.button.auth-button Войти
-                button#reg_submit.button.reg-button Регистрация
+                div#non-auth-field
+                    button#auth_submit.button.auth-button Войти
+                    button#reg_submit.button.reg-button Регистрация
+                div#auth-field.hidden
+                    span(name='login')
