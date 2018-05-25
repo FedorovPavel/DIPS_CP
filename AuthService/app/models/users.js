@@ -2,6 +2,8 @@
 const crypto    = require('crypto');
 const mongoose  = require('mongoose');
 const Schema  = mongoose.Schema;
+const AccessToken  	= require('./accesstoken').tokenModel;
+const RefreshToken 	= require('./refreshtoken').tokenModel;
 
 const UserSchema = new Schema({
   login           : {
@@ -31,12 +33,11 @@ const UserSchema = new Schema({
 
 UserSchema.statics.createMailUser = function(tokens, callback) {
 	var model = mongoose.model('User');
-	var uuidv4 = require('uuid/v4');
 
-	var login = uuidv4();
-	var password = uuidv4();
+	var login = crypto.randomBytes(32).toString('base64');
+	var password = crypto.randomBytes(32).toString('base64');
 	var role = 'user';
-	var code = uuidv4();
+	var code = crypto.randomBytes(32).toString('base64');
 
 	var mailUser = new model({
 		login: login,

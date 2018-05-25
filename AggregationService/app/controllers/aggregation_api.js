@@ -124,7 +124,7 @@ router.get('/code', function(req, res, next){
 //mail auth
 router.get('/mailAuth', function(req, res, next){
 	const authUrl = "https://connect.mail.ru/oauth/authorize?";
-	const aggregatorUrl = "http://localhost:3000/aggregator/mailCode";
+	const aggregatorUrl = "http://23.105.226.186/aggregator/mailCode";
 	const queryParametrs = ['client_id='+mailApp.id, 'response_type=code', 'redirect_uri='+aggregatorUrl];
 	const url = authUrl + queryParametrs.join('&');
 	return res.status(302).redirect(url);
@@ -145,7 +145,7 @@ router.get('/mailCode', function(req, res, next){
 		status : status,
 		response : response
 	  };
-	  return statSender.sendAuthorizationInfo(info);
+	  return;// statSender.sendAuthorizationInfo(info);
 	});
 });
 
