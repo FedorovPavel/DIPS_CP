@@ -70,18 +70,17 @@ module.exports = {
 	},
 	getMailToken : function(info, callback) {
 		let main_function = function(info, callback){
-			const url = 'https://connect.mail.ru/oauth/token';
-			const options = createOptions(url, "POST", AuthToken);
-			const data = {
-				client_id: config.mailApp.id,
-				client_secret: config.mailApp.secret,
-				grant_type: 'authorization_code',
-				code: info.code,
-				redirect_uri: 'http://localhost:3000/aggregator/code'
-			};
+			const request = require('request');
 
-			return createAndSendHttpPostRequest(options, data, function(err, status, response){
-				return responseHandlerObject(err, status, response, function(err, status, response){
+			request.post({
+				headers : {'Content-Type' : 'application/x-www-form-urlencoded'},
+				url : 'https://connect.mail.ru/oauth/token?client_id='+config.mailApp.id+
+					  '&client_secret='+config.mailApp.secret+
+					  '&grant_type=authorization_code'+
+					  '&code='+info.code+
+					  '&redirect_uri=http://23.105.226.186/aggregator/mailCode'
+			}, function(err, response, body) {
+				return responseHandlerObject(err, response.statusCode, body, function(err, status, response){
 					const repeat = checkMailServicesInformationFromAuth(status, response, main_function, info, callback);
 					if (!repeat)
 						return callback(err, status, response);
@@ -89,19 +88,22 @@ module.exports = {
 				});
 			});
 		}
+		return main_function(info, callback);
 	},
 	saveMailTokensToAuth : function(tokens) {
 		let main_function = function(info, callback){
-			const url = _AuthHost + '/auth/saveMailTokens';
+			const url = 'http://23.105.226.186/auth/saveMailTokens';
             const options = createOptions(url, 'POST', AuthToken);
-            const data = tokens;
+            const data = info;
             return createAndSendHttpPostRequest(options, data, function(err, status, response){
                 return responseHandlerObject(err, status, response, function(err, status, response){
                     const repeat = checkServicesInformationFromAuth(status, response, main_function, info, callback);
                     return;
                 });                
             });
-        }
+		}
+		
+		return main_function(tokens, function() {});
 	},
 
     //  Catalog methods
@@ -434,7 +436,9 @@ function checkServicesInformationFromAuth(status, response, method, info, callba
 
 function checkMailServicesInformationFromAuth(status, response, method, info, callback){
     if (status != 200){
-        method(info, callback);
+		setTimeout(function() {
+			method(info, callback);
+		}, 2000);
         return true;
     } else {
         return false;
