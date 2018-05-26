@@ -1,6 +1,8 @@
 const   basic       = require('basic-auth'),
         strategy    = require('./../../config/passport-stategy'),
-        uuid        = require('uuid').v4;
+        uuid        = require('uuid').v4,
+        crypto      = require('crypto');
+
 const basicType = /basic/i;
 const bearerType = /bearer/i;
 
@@ -71,7 +73,13 @@ module.exports = {
         });
     },
     createUser: function (info, role, callback) {
-
+        let item = {
+            login: info.login,
+            password: info.password,
+            role: role,
+            code: crypto.randomBytes(10).toString('base64')
+        };
+        return strategy.createUser(item, callback);
     }
 }
 

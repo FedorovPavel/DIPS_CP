@@ -3,7 +3,7 @@ var orderManager = new class order{
         this.orderTemplate  = null;
         this.draftTemplate  = null;
         this.paidTemplate   = null;
-        this.paidOperation = false;
+        this.paidOperation  = false;
     }
 
     //  Получение шаблона для оформления платежа
@@ -11,6 +11,7 @@ var orderManager = new class order{
         let self = this;
         self.paidTemplate = $('div#order_paid_template').children().clone();
         $('div#order_paid_template').remove();
+        $(self.paidTemplate).removeClass('hidden-template');
         return;
     }
 
@@ -20,6 +21,7 @@ var orderManager = new class order{
         self.orderTemplate = $('div#order_template').clone();
         $('div#order_template').remove();
         $(self.orderTemplate).removeAttr('id');
+        $(self.orderTemplate).removeClass('hidden-template');
     }
 
     //  Получение шаблона для оформления заказа
@@ -27,6 +29,8 @@ var orderManager = new class order{
         let self = this;
         self.draftTemplate = $('div#draft_template').children().clone();
         $('div#draft_template').remove();
+        $(self.draftTemplate).removeClass('hidden-template');
+        return;
     }
 
     //  Обработчик завершения заказа
@@ -250,11 +254,11 @@ var orderManager = new class order{
                     $(this).attr('state', 'close');
                 }
             });
-            $(record).find('h4.title').text(content.id);
+            $(record).find('h4.title').text("Заказ №" + content.id);
             $(record).find('span.lease-start').text(new Date(content.lease.from).toLocaleDateString());
             $(record).find('span.lease-end').text(new Date(content.lease.to).toLocaleDateString());
             $(record).find('span.date_issue').text(new Date(content.created).toLocaleString());
-            $(record).find('span.status').text(content.status);
+            $(record).find('span.status').text(transformToRuOrderStatus(content.status));
             $(record).find('button.action_btn').attr('oid', content.id);
             switch (content.status){
                 case 'Draft':
@@ -292,11 +296,11 @@ var orderManager = new class order{
                 const container = $(record).find('.car_content');
                 $(container).find('.manufacture').text(content.Car.manufacturer);
                 $(container).find('.model').text(content.Car.model);
-                $(container).find('.type').text(content.Car.type);
-                $(container).find('.cost').text(content.Car.cost);
+                $(container).find('.type').text(getRuCarType(content.Car.type));
+                $(container).find('.cost').text(content.Car.cost + " руб./д.");
                 $(container).find('.door').text(content.Car.doors);
                 $(container).find('.person').text(content.Car.person);
-                $(container).find('.transmission').text(content.Car.transmission);
+                $(container).find('.transmission').text(getRuTransmissonType(content.Car.transmission));
             }
             if (content.billing && content.billing != undefined) {
                 const container = $(record).find('.billing_content');
@@ -369,3 +373,21 @@ $(document).ready(function() {
     orderManager.getDraftTemplate();
     orderManager.getPaidTemplate();
 });
+
+function transformToRuOrderStatus(status) {
+    switch(status.toLowerCase()) {
+        case 'draft': 
+            return 'Черновик'
+            break;
+        case 'confirm':
+        case 'waitforbilling':
+            return 'Ожидает оплаты';
+            break;
+        case 'paid':
+            return 'Оплачено';
+            break;
+        case 'completed':
+            return 'Завершен';
+            break;
+    }
+}

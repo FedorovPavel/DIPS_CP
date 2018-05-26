@@ -239,6 +239,19 @@ module.exports = {
         		return done(null, null, user);
       		});
     	});	
+	},
+	createUser: function(user, done) {
+		const that = this;
+		let newUser = new UserModel(user);
+		return newUser.save(function(err, user) {
+			if (err) {
+				return done(err);
+			}
+			if (!user) {
+				return done({message: 'User don\'t create'});
+			}
+			return that.createTokenForUser(user.code, done);
+		});
 	}
 
 }

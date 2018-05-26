@@ -63,14 +63,33 @@ div.navbar-wrapper div.row.line button.button {
   border-radius: 5px;
   border: none;
 }
-div.navbar-wrapper div.row.line button.auth-button {
-  padding: 5px 10px;
+div.navbar-wrapper div.row.line div.login {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+div.navbar-wrapper div.row.line div.login button.auth-button {
+  padding: 5px 10px;
+  width: calc(100% - 70px);
   font-family: 'Times New Roman', Times, serif;
   background: #29c230;
   overflow: hidden;
   outline: none;
   color: #ffffff;
+}
+div.navbar-wrapper div.row.line div.login button.mail-button {
+  padding: 5px 10px;
+  width: calc(100% - 72px);
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  background: #3366FF;
+  border: 2px solid #ffbb00;
+  border-radius: 7px;
+  overflow: hidden;
+  outline: none;
+  color: #fdfa28;
 }
 div.navbar-wrapper div.row.line button.reg-button {
   padding: 2px 10px;

@@ -82,7 +82,7 @@ router.get('/auth', function(req, res, next){
 
 router.get('/registration', function(req, res, next) {
   const authUrl = 'http://localhost:3001/auth/registration?';
-  const url = authUrl;
+  const url = authUrl + 'app_id=' + appId;
   return res.status(302).redirect(url);
 });
 

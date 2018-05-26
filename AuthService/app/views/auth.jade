@@ -1,13 +1,21 @@
 head
     link(rel='stylesheet', href="/css/style.css")
 body
+    div.header
+        img.logo(src='/img/logo.png')
+        span.title QuickRentCar
+    div.sub-header
+        span.sub-title Авторизация
     form#authForm(method="POST", action="/auth/login")
         input.hidden(name="response_type", value=response_type, readonly)
         input.hidden(name="redirect_uri", value=redirect_uri, readonly)
         input.hidden(name="app_id", value=app_id, readonly)
-        p Логин
-        input(name="login", required)
-        p Пароль
-        input(name="password", type="password", required)
-        input.on-center(type="submit")
+        div.field
+            span Логин
+            input(name="login", required)
+        div.field
+            span Пароль
+            input(name="password", type="password", required)
+        div.field.field-submit
+            input.on-center(type="submit")
     

@@ -5,6 +5,7 @@
 @menu-field-hover   : #606060;
 @dark-text          : #353535;
 @menu-field-active  : #eeeeee;
+@mail-color         : #3366FF;
 @screen-lg-min      : 1200px;
 @screen-md-min      : 992px;
 @screen-sm-min      : 768px;
@@ -72,16 +73,36 @@ div.navbar-wrapper{
             border-radius: 5px;
             border: none;
         }
-        button.auth-button{
-            // height: 20px;
-            padding: 5px 10px;
+        div.login{
             width: 100%;
-            font-family: 'Times New Roman', Times, serif;
-            background: @auth-color;
-            overflow: hidden;
-            outline: none;
-            color: @light-text;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            button.auth-button{
+                padding: 5px 10px;
+                width: ~'calc(100% - 70px)';
+                font-family: 'Times New Roman', Times, serif;
+                background: @auth-color;
+                overflow: hidden;
+                outline: none;
+                color: @light-text;
+            }
+
+            button.mail-button{
+                padding: 5px 10px;
+                width: ~'calc(100% - 72px)';
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: 800;
+                background: @mail-color;
+                border: 2px solid rgb(255, 187, 0);
+                border-radius: 7px;
+                overflow: hidden;
+                outline: none;
+                color:  rgba(253, 250, 40,1);
+            }
         }
+        
         button.reg-button{
             // height: 20px;
             padding: 2px 10px;

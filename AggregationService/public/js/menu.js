@@ -14,6 +14,7 @@ var menuManager = new class menu {
         this.token = null;
         this.refreshToken = null;
         this.tokenTimer = null;
+        this.iframeTemplate = null;
     };
     //  Error template
 
@@ -60,6 +61,14 @@ var menuManager = new class menu {
         $(template).removeClass('absolute-position');
         $(template).find('.error_content').addClass('list');
         $(self.getList()).append(template);
+        return;
+    }
+
+    getIFrameTemplate() {
+        let self = this;
+        self.iframeTemplate = $('div#iframe_template').clone();
+        $('div#iframe_template').remove();
+        $(self.iframeTemplate).removeClass('hidden-template');
         return;
     }
 
@@ -468,8 +477,8 @@ var menuManager = new class menu {
 
     authUser(){
         let self = this;
-        let frame = document.createElement('iframe');
-        frame.id = 'auth';
+        let frameTemplate = $(self.iframeTemplate).clone();
+        let frame = $(frameTemplate).find('iframe')[0];
         frame.sandbox.add("allow-forms");
         frame.sandbox.add("allow-pointer-lock");
         frame.sandbox.add("allow-popups");
@@ -477,7 +486,39 @@ var menuManager = new class menu {
         frame.sandbox.add("allow-scripts");
         frame.sandbox.add("allow-top-navigation");
         frame.src = 'http://localhost:3000/aggregator/auth';
-        $('body').append(frame);
+        $('body').append(frameTemplate);
+        frame.onload = function(){
+            frame.style.display = 'none';
+            let url = "";
+            try{
+                url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
+            } catch(err){
+                frame.style.display = 'block';
+            }
+            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            if (check.test(url)){
+                let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
+                self.token = res.access_token;
+                self.refreshToken = res.refresh_token;
+                $(frameTemplate).remove();
+            } else {
+                frame.style.display = 'block';
+            }
+        }
+    }
+
+    regUser() {
+        let self = this;
+        let frameTemplate = $(self.iframeTemplate).clone();
+        let frame = $(frameTemplate).find('iframe')[0];
+        frame.sandbox.add("allow-forms");
+        frame.sandbox.add("allow-pointer-lock");
+        frame.sandbox.add("allow-popups");
+        frame.sandbox.add("allow-same-origin");
+        frame.sandbox.add("allow-scripts");
+        frame.sandbox.add("allow-top-navigation");
+        frame.src = 'http://localhost:3000/aggregator/registration';
+        $('body').append(frameTemplate);
         frame.onload = function(){
             frame.style.display = 'none';
             let url = "";
@@ -498,36 +539,8 @@ var menuManager = new class menu {
         }
     }
 
-    regUser() {
-        let self = this;
-        let frame = document.createElement('iframe');
-        frame.id = 'reg';
-        frame.sandbox.add("allow-forms");
-        frame.sandbox.add("allow-pointer-lock");
-        frame.sandbox.add("allow-popups");
-        frame.sandbox.add("allow-same-origin");
-        frame.sandbox.add("allow-scripts");
-        frame.sandbox.add("allow-top-navigation");
-        frame.src = 'http://localhost:3000/aggregator/registration';
-        $('body').append(frame);
-        frame.onload = function(){
-            frame.style.display = 'none';
-            let url = "";
-            try{
-                url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
-            } catch(err){
-                frame.style.display = 'block';
-            }
-            const check = /http:\/\/localhost:3000\/aggregator\/code/;
-            if (check.test(url)){
-                let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
-                self.token = res.access_token;
-                self.refreshToken = res.refresh_token;
-                $(frame).remove();
-            } else {
-                frame.style.display = 'block';
-            }
-        }
+    closeFrame() {
+        $('div#iframe_template').remove();
     }
 
     refresh(){
@@ -635,6 +648,7 @@ var menuManager = new class menu {
 $(document).ready(function(){
     menuManager.getErrorTemplate();
     menuManager.getReportsTemplate();
+    menuManager.getIFrameTemplate();
     menuManager.bindHandleToHeader();
     menuManager.recordCounter();
     menuManager.changePager();

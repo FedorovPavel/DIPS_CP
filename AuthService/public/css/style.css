@@ -1,19 +1,89 @@
 body {
-  padding: 50px;
+  padding: 10px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
+}
+div.header{
+  width: 100%;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid #353535;
+}
+
+img.logo{
+  margin-left: 100px;
+  height: 100%;
+  filter: invert(1);
+}
+
+span.title{
+  margin-left: 10px;
+  font-size: 24px;
+  font-weight: 1000;
+  font-style: italic;
+  font-family: 'Times New Roman', Times, serif;
+  text-decoration: underline;
+  color: #353535;
+  display: inline-block;
+}
+
+div.sub-header{
+  width: 100%;
+  text-align: center;
+}
+
+div.sub-header span.sub-title{
+  font-size: 20px;
+  font-weight: 800;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #3366FF;
+}
+
+div.field{
+  margin: 15px 10px;
+  width: calc(100% - 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+div.field span{
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  margin-bottom: 4px;
+  margin-left: 10px;
+}
+
+div.field input{
+  width: calc(100% - 30px);
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 14px;
 }
 
 .hidden{
   display: none;
 }
-input{
-  display: block;
+
+div.field.field-submit{
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
-input.on-center{
-  text-align: center;
-}
-
-a {
-  color: #00B7FF;
+div.field.field-submit input{
+  background: #3366FF;
+  color: #fff;
+  padding: 5px 10px;
+  width: auto;
+  border-radius: 5px;
+  border: none;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
 }
