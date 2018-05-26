@@ -19,27 +19,85 @@ div.draft_form div.panel {
   border-radius: 5px;
   padding: 20px;
 }
-div.draft_form div.panel span.dateErr {
+div.draft_form div.panel button.btn_close {
+  outline: none;
+}
+div.draft_form div.panel h2.title {
+  margin-top: 0px;
+}
+div.draft_form div.panel div.car_desc {
+  width: calc(100% - 50px);
+  margin: 12px 25px;
+}
+div.draft_form div.panel div.car_desc div.title {
+  width: 100%;
+  text-align: center;
+}
+div.draft_form div.panel div.car_desc div.line {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+div.draft_form div.panel div.car_desc div.line div.line-label {
+  width: calc(50% - 30px);
+  text-align: right;
+  margin-right: 30px;
+}
+div.draft_form div.panel div.car_desc div.line div.line-value {
+  width: calc(50% - 30px);
+  text-align: left;
+  margin-left: 30px;
+}
+div.draft_form div.panel div.date-select {
+  width: calc(100% - 50px);
+  margin: 12px 25px;
+}
+div.draft_form div.panel div.date-select div.title {
+  width: 100%;
+  text-align: center;
+}
+div.draft_form div.panel div.date-select div.date-selector {
+  margin: 10px 0px;
+  text-align: center;
+  width: 100%;
+}
+div.draft_form div.panel div.date-select div.date-selector input {
+  font-size: 20px;
+}
+div.draft_form div.panel div.date-select div.cost-counter {
+  width: 100%;
+  height: 30px;
+  text-align: center;
+}
+div.draft_form div.panel div.date-select div.cost-counter span {
+  color: #353535;
+}
+div.draft_form div.panel div.date-select div.err {
+  width: 100%;
+  height: 20px;
+  text-align: center;
+}
+div.draft_form div.panel div.date-select div.err span.dateErr {
   color: #e24304;
   font-size: 18px;
   font-weight: 700;
 }
-div.draft_form div.panel button.btn_close {
-  outline: none;
+div.draft_form div.panel div.button_field {
+  width: 100%;
+  text-align: center;
+}
+div.draft_form div.panel div.button_field button.btn {
+  background: #0288d1;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
 }
 div.draft_form div.panel span {
   font-size: 15px;
 }
 div.draft_form div.panel span.head_label {
-  font-size: 18px;
-  font-weight: 700;
-}
-div.draft_form div.panel div.button_field {
-  margin-top: 20px;
-}
-div.draft_form div.panel div.button_field button.btn {
-  background: #0288d1;
-  color: #ffffff;
   font-size: 18px;
   font-weight: 700;
 }

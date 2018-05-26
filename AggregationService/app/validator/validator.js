@@ -86,5 +86,5 @@ module.exports = {
         const month = parseInt(dateParts[1]);
         const day   = parseInt(dateParts[0]);
         return new Date(year, month - 1, day);
-    }
+    },
 }

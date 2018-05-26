@@ -33,7 +33,7 @@ router.get('/cars', function (req, res, next) {
     let filters = getFilters(req);
     return catalog.getCars(page, count, filters, function (err, cars) {
       if (err) {
-        return res.status(500).send(responseTemplate('Error', 'Sorry DB doesn\'t work now, please try again later', scope));
+        return res.status(500).send(responseTemplate('Error', err, scope));
       }
       return catalog.getCount(function (err, countRecord) {
         if (err) {

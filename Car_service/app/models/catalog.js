@@ -233,10 +233,6 @@ let middleware = new class {
         callback(err, null);
       }
 
-      if (!carDocs || carDocs.length == 0) {
-        return callback('Not found car on page : ' + page + ' in quanitity: ' + count);
-      }
-
       let result = [];
       for (let I = 0; I < carDocs.length; I++) {
         result.push(carDocs[I].getObject());
@@ -449,14 +445,18 @@ function transformFilterToQuery(filters) {
   for (let key in filters) {
     switch (key) {
       case 'ma':
-        queryParam.manufacture = filters[key];
+        queryParam.manufacture = {
+          '$regex': new RegExp('^' + filters[key],'i')
+        }
         break;
       case 'mo':
-        queryParam.model = filters[key];
+        queryParam.model = {
+          '$regex': new RegExp('^' + filters[key], 'i')
+        }
         break;
       case 't':
         queryParam.type = {
-          $in: filters[key].split(',')
+          '$in': filters[key].split(',')
         };
         break;
       case 'd':
@@ -474,12 +474,28 @@ function transformFilterToQuery(filters) {
         }
       case 'minC':
         {
-          queryParam.cost['$gt'] = filters[key];
+          if (queryParam.cost != undefined)
+            queryParam.cost = Object.assign(queryParam.cost, {
+              '$gt':filters[key]
+            });
+          else {
+            queryParam.cost= {
+              '$gt':filters[key]
+            }
+          }
           break;
         }
       case 'maxC':
         {
-          queryParam.cost['$lt'] = filters[key];
+          if (queryParam.cost != undefined)
+            queryParam.cost = Object.assign(queryParam.cost, {
+              '$lt':filters[key]
+            });
+          else {
+            queryParam.cost = {
+              '$lt':filters[key]
+            }
+          }
           break;
         }
     }

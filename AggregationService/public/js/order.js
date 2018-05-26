@@ -1,6 +1,5 @@
 var orderManager = new class order{
-    constructor(menu){
-        this.menu       = menu;
+    constructor(){
         this.orderTemplate  = null;
         this.draftTemplate  = null;
         this.paidTemplate   = null;
@@ -33,30 +32,30 @@ var orderManager = new class order{
     //  Обработчик завершения заказа
     handleToCompleted(id, sender){
         let self = this;
-        id = self.menu.checkID(id);
+        id = menuManager.checkID(id);
         if (id){
             let req = new XMLHttpRequest();
             const url = '/aggregator/orders/complete/' + id;
             req.open('PUT', url, true);
-            req.setRequestHeader("Authorization", "Bearer " + self.menu.token);
+            req.setRequestHeader("Authorization", "Bearer " + menuManager.token);
             req.onreadystatechange = function(){
                 if (req.readyState != 4)
                     return;
                 if (req.stauts == 401){
-                    if (self.menu.refreshToken != null){
-                        self.menu.refresh();
+                    if (menuManager.refreshToken != null){
+                        menuManager.refresh();
                         setTimeout(function(){
                             self.handleToCompleted(id, sender);
                         }, 1000);
                     } else {
                         $('div#authForm').removeClass('hidden');
-                        self.menu.rendErrorTemplate(req.response.message, req.status);
+                        menuManager.rendErrorTemplate(req.response.message, req.status);
                     }
                     return;
                 }
                 if (req.status == 202){
-                    const list = self.menu.getList();
-                    self.menu.experidToken();    
+                    const list = menuManager.getList();
+                    menuManager.experidToken();    
                     const record = $(list).find('div').filter(function(){
                         if ($(this).attr('id') == id)
                             return true;
@@ -64,7 +63,7 @@ var orderManager = new class order{
                     $(record).find('span.status').text('Completed');
                     $(sender).remove();
                 } else {
-                    self.menu.rendErrorTemplate(req.response.message, req.status);
+                    menuManager.rendErrorTemplate(req.response.message, req.status);
                 }
             }
             req.send();
@@ -81,26 +80,26 @@ var orderManager = new class order{
         const url = '/aggregator/orders/paid/' + id;
         req.open('PUT', url, true);
         req.setRequestHeader('Content-type','application/json; charset=utf-8');
-        req.setRequestHeader("Authorization", "Bearer " + self.menu.token);
+        req.setRequestHeader("Authorization", "Bearer " + menuManager.token);
         req.onreadystatechange = function(){
             if (req.readyState != 4)
                 return;
             if (req.status == 401){
-                if (self.menu.refreshToken != null){
-                    self.menu.refresh();
+                if (menuManager.refreshToken != null){
+                    menuManager.refresh();
                     setTimeout(function(){
                         self.sendPaidInfo(id, data, sender);
                     }, 1000);
                 } else {
                     $('div#authForm').removeClass('hidden');
-                    self.menu.rendErrorTemplate(JSON.parse(req.response).message, req.status);
+                    menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
                 }
                 return;
             }
             if (req.status == 200){
-                self.menu.experidToken();    
+                menuManager.experidToken();    
                 $(sender).text('Завершить');
-                const list = self.menu.getList();
+                const list = menuManager.getList();
                 const record = $(list).find('div').filter(function(){
                     if ($(this).attr('id') == id)
                         return true;
@@ -113,7 +112,7 @@ var orderManager = new class order{
                 $('body').find('#paid_panel').remove();
                 self.paidOperation = false;
             } else {
-                self.menu.rendErrorTemplate(JSON.parse(req.response).message, req.status);
+                menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
             }
         }
         req.send(data);
@@ -122,7 +121,7 @@ var orderManager = new class order{
     //  Обработчик на оплату заказа
     handleToPaid(id, sender){
         let self = this;
-        id = self.menu.checkID(id);
+        id = menuManager.checkID(id);
         if (id){
             if (self.paidOperation){
                 const form = $('body').find('#paid_panel');
@@ -142,31 +141,31 @@ var orderManager = new class order{
     //  Обработчик на подтверждение заказа
     handleToConfirm(id, sender){
         let self = this;
-        id = self.menu.checkID(id);
+        id = menuManager.checkID(id);
         if (id){
             let req = new XMLHttpRequest();
             const url = '/aggregator/orders/confirm/' + id;
             req.open('PUT', url, true);
-            req.setRequestHeader("Authorization", "Bearer " + self.menu.token);
+            req.setRequestHeader("Authorization", "Bearer " + menuManager.token);
             req.onreadystatechange = function(){
                 if (req.readyState != 4)
                     return;
                 if (req.status == 401){
-                    if (self.menu.refreshToken != null){
-                        self.menu.refresh();
+                    if (menuManager.refreshToken != null){
+                        menuManager.refresh();
                         setTimeout(function(){
                             self.handleToConfirm(id, sender);
                         },1000);
                     } else {
                         $('div#authForm').removeClass('hidden');
-                        self.menu.rendErrorTemplate(JSON.parse(req.response).message, req.status);
+                        menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
                     }
                     return;
                 }
                 if (req.status == 200){
-                    self.menu.experidToken();    
+                    menuManager.experidToken();    
                     $(sender).text('Оплатить');
-                    const list = self.menu.getList();
+                    const list = menuManager.getList();
                     const record = $(list).find('div').filter(function(){
                         if ($(this).attr('id') == id)
                             return true;
@@ -175,7 +174,7 @@ var orderManager = new class order{
                     $(sender).unbind('click');
                     $(sender).click(function(sender){self.handleToPaid(id, this);});
                 } else {
-                    self.menu.rendErrorTemplate(JSON.parse(req.response).message, req.status);
+                    menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
                 }
             }
             req.send();
@@ -184,40 +183,40 @@ var orderManager = new class order{
         }
     }
     
-    getOrders(page, count, bind) {
-        let self = bind;
+    getOrders(page, count) {
+        let self = orderManager;
         const url = '/aggregator/orders?page=' + page + '&count=' + count;
         let req = new XMLHttpRequest();
         req.open('GET', url, true);
-        req.setRequestHeader("Authorization", "Bearer " + self.menu.token);
+        req.setRequestHeader("Authorization", "Bearer " + menuManager.token);
         req.onreadystatechange = function(){
             if (req.readyState != 4)
                 return;
             if (req.status == 401){
-                if (self.menu.refreshToken){
-                    self.menu.refresh();
+                if (menuManager.refreshToken){
+                    menuManager.refresh();
                     setTimeout(function(){
-                        self.getOrders(page, count, bind);
+                        self.getOrders(page, count);
                     },1000);
                 } else {
                     $('div#authForm').removeClass('hidden');
-                    self.menu.rendErrorTemplate(JSON.parse(req.response).message, req.status);
+                    menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
                 }
                 return;
             } else if (req.status == 200){
-                self.menu.clearList();
-                self.menu.experidToken();    
+                menuManager.clearList();
+                menuManager.experidToken();    
                 let res = JSON.parse(req.response);
                 if (res){
                     self.fillListWithOrder(res.content.orders);
-                    self.menu.pagination(res.content.info.current, res.content.info.pages);
+                    menuManager.pagination(res.content.info.current, res.content.info.pages);
                 }
             } else if (req.status == 503){
-                self.menu.rendErrorTemplateToList(req.response, req.status);
-                self.menu.pagination(0,0);
+                menuManager.rendErrorTemplateToList(req.response, req.status);
+                menuManager.pagination(0,0);
             } else {
-                self.menu.rendErrorTemplateToList(JSON.parse(req.response).message, req.status);
-                self.menu.pagination(0,0);
+                menuManager.rendErrorTemplateToList(JSON.parse(req.response).message, req.status);
+                menuManager.pagination(0,0);
             }
 
         }
@@ -308,7 +307,7 @@ var orderManager = new class order{
             } else {
                 $(record).find('.billing_content').remove();
             }
-            $(self.menu.getList()).append(record);
+            $(menuManager.getList()).append(record);
         }
     }
 
@@ -318,7 +317,7 @@ var orderManager = new class order{
         $(form).find('button.btn_submit').attr('id', id);
         $(form).find('.btn_close').click(function(){$(form).remove(); self.paidOperation = false});
         $(form).find('#paySystem').change(function(){
-            const value = self.menu.checkPaySystem(this.value);
+            const value = menuManager.checkPaySystem(this.value);
             if (!value)
                 $(form).find('span.errStatus').text('Некорректная платежная система');
             else {
@@ -326,14 +325,14 @@ var orderManager = new class order{
             }
         });
         $(form).find('#account').focusout(function(){
-            if (!self.menu.checkAccount(this.value)){
+            if (!menuManager.checkAccount(this.value)){
                 $(form).find('span.errStatus').text('Неправильно введен счет');
             } else {
                 $(form).find('span.errStatus').text('');
             }
         });
         $(form).find('#cost').focusout(function(){
-            if (!self.menu.checkCost(this.value)){
+            if (!menuManager.checkCost(this.value)){
                 $(form).find('span.errStatus').text('Неправильная сумма');
             }else{
                 $(form).find('span.errStatus').text('');
@@ -341,9 +340,9 @@ var orderManager = new class order{
         });
         $(form).find('button.btn.btn_submit').click(function(){
             const data = {
-                paySystem   : self.menu.checkPaySystem($(form).find('option').filter(':selected').val()),
-                account     : self.menu.checkAccount($(form).find('#account').val()),
-                cost        : self.menu.checkCost($(form).find('#cost').val())
+                paySystem   : menuManager.checkPaySystem($(form).find('option').filter(':selected').val()),
+                account     : menuManager.checkAccount($(form).find('#account').val()),
+                cost        : menuManager.checkCost($(form).find('#cost').val())
             }
             if (!data.paySystem){
                 $(form).find('#paySystem').focus();

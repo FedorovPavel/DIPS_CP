@@ -221,7 +221,7 @@ const manager = new class {
 		return orderORM.getOrder(id, uid, callback);
 	}
 
-	getCount(uid, callback) {
+	getCount(id, callback) {
 		return orderORM.getCount(id, callback);
 	}
 

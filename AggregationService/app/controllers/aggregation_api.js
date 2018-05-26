@@ -147,20 +147,49 @@ router.get('/mailCode', function(req, res, next){
 	  };
 	  return statSender.sendAuthorizationInfo(info);
 	});
-  });
+});
 
-// Get any cars
+
+  // Get any cars
 router.get('/catalog', function(req, res, next){
   let page  = validator.checkPageNumber(req.query.page);
   let count = validator.checkCountNumber(req.query.count);
-  const filters = getFilters(req);
+  let queryParams = getQueryParams(req.query);
   const dataContainer = {
     page : page,
-    count : count
+    count : count,
+    query: queryParams
   };
-  bus.getCars(dataContainer, function(err, statusCode = 500, responseText){
-    res.status(statusCode).send(responseText);
+  return bus.getCars(dataContainer, function(err, statusCode = 500, responseText){
+    return res.status(statusCode).send(responseText);
   });
+
+  /**
+   * @param {Object} query 
+   */
+  function getQueryParams(query) {
+    let validQuery = '';
+    delete query.page;
+    delete query.count;
+    let keys = Object.keys(query);
+    for(let I = 0; I < keys.length; I++){
+      switch(keys[I]) {
+        case 'ma': 
+        case 'mo':
+        case 't':
+        case 'tr':
+        case 'd':
+        case 'p':
+        case 'minC':
+        case 'maxC':
+          validQuery += keys[I] + '=' + query[keys[I]] + '&';
+          break;
+      }
+    }
+    if (validQuery.length > 0 && validQuery[validQuery.length - 1] == '&') 
+      validQuery = validQuery.slice(0, -1);
+    return validQuery;
+  }
 });
 
 //  Get car by ID
@@ -405,9 +434,4 @@ function checkAuthAndGetUserInfo(req, res, callback){
       return res.status(status).send(response);
     return callback(response)
   });
-}
-
-function getFilters() {
-
-  return null;
 }

@@ -107,7 +107,9 @@ module.exports = {
     //  Catalog methods
     getCars: function (dataContainer, callback) {
         let main_function = function(data, callback){
-            const url = _CatalogHost + '/cars?page=' + data.page + '&count=' + data.count;
+            let url = _CatalogHost + '/cars?page=' + data.page + '&count=' + data.count;
+            if (dataContainer.query.length > 0)
+                url += '&' + dataContainer.query;
             const options = createOptions(url, 'GET', CatalogToken);
             return createAndSendGetHttpRequest(options, function (err, status, response) {
                 return responseHandlerObject(err, status, response, function(err, status, response){
@@ -466,7 +468,7 @@ function checkServicesInformationFromCatalog(status, response, method, info, cal
         CatalogToken = null;
         method(info, callback);
         return true;
-    } else if (response.scope != undefined){
+    } else if (response && response.scope != undefined){
         console.log('Set new CatalogToken');
         CatalogToken = response.scope;
         delete response.scope;

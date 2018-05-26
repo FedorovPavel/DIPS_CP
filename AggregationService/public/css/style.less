@@ -1,3 +1,64 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
+
+div.filter-row{
+  position: relative;
+  div#car-filter{
+    position: fixed;
+    top: 10%;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.5);
+    div.field{
+      width: ~"calc(100% - 24px)";
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin: 4px 12px;
+      input{
+        width: 100%;
+      }
+      select{
+        width: 100%;
+      }
+      .label{
+        font-size: 16px;
+      }
+      span{
+        color: #000;
+      }
+      div.cost-field{
+        width: 45%;
+        input{
+          width: 100%;
+        }
+      }
+    }
+    div.submit-field{
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      div.submit{
+        width: 100px;
+        background: #29c230;
+        text-align: center;
+        padding: 5px;
+        border-radius: 3px;
+        span{
+          font-size: 14px;
+          color: #fff;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+      }
+    }
+  }
+  div#car-filter.hidden-filter{
+    display: none;
+  }
+}

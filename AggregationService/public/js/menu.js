@@ -62,6 +62,12 @@ var menuManager = new class menu {
         $(self.getList()).append(template);
         return;
     }
+
+    checkAuth() {
+        if (this.refreshToken)
+            return true;
+        return false;
+    }
     
     //  Validate methods 
     checkPosIntNumber(text){
@@ -126,19 +132,6 @@ var menuManager = new class menu {
         } else {
             return null;
         }
-    }
-
-    ConvertStringToDate(date){
-        date = String(date);
-        if (!date)
-            return null;
-        const dateParts = date.split('-');
-        if (!dateParts || dateParts.length != 3)
-            return null;
-        const year  = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]);
-        const day   = parseInt(dateParts[2]);
-        return day + '.' + month +'.' + year;
     }
 
     getList(){
@@ -240,8 +233,10 @@ var menuManager = new class menu {
         let self = this;
         let type = self.openTabs;
         rebindPager();
+        carManager.disableFilters();
         switch (type){
             case menuTab.catalog:
+                carManager.enableFilters();
                 bindPager(carManager.getCars);
                 break;
             case menuTab.orders:
@@ -276,13 +271,14 @@ var menuManager = new class menu {
         let self = this;
         //  Обработчик даты
         let dataHandleValidator = function(input_id, msg){
-            let data = self.ConvertStringToDate($(panel).find('input#' + input_id).val());
+            let data = ($(panel).find('input#' + input_id).val());
             if (!data){
                 $(panel).find('input#'+input_id).focus();
                 $(panel).find('span.dateErr').text(msg);
-                return;
+                return false;
             } else {
                 $(panel).find('span.dateErr').text('');   
+                return true;
             }
         }
         //  Закрытие панели
@@ -292,20 +288,37 @@ var menuManager = new class menu {
         });
         //  Заполнение полей
         $(panel).find('h2.title').text("Оформление заказа");
-        $(panel).find('span.manufacture').text(car.manufacturer);
+        $(panel).find('span.manufacture').text(car.manufacture);
         $(panel).find('span.model').text(car.model);
-        $(panel).find('span.type').text(car.type);
-        $(panel).find('span.cost').text(car.cost);
+        $(panel).find('span.type').text(getRuCarType(car.type));
+        $(panel).find('span.cost').text(car.cost + ' руб./д.');
         $(panel).attr('carId', car.id);
         //  Поле ошибок заполнения
         const err_line = $(panel).find('span.dataErr');
         //  Заполнение начала ренты 
-        $(panel).find('input#startDate').focusout(function(){
-            dataHandleValidator('startDate','Неправильная дата начала аренды');
+        const datepicker = $(panel).find('input#datepicker');
+        $(datepicker).datepicker({
+            minDate: new Date(),
+            range: true,
+            multipleDatesSeparator: " - "
         });
-        //  Заполнение окончания ренты 
-        $(panel).find('input#endDate').focusout(function(){
-            dataHandleValidator('endDate','Неправильная дата окончания аренды');
+        $(datepicker).mask('00.00.00 - 00.00.00');
+        $(datepicker).focusout(function(){
+            let res = dataHandleValidator('datepicker','Неправильно задан диапозон дат');
+            if (res){
+                let cost = car.cost;
+                let dateDif = $('input#datepicker').val().split(' - ');
+                if (dateDif.length != 2) 
+                    return;
+                dateDif[0] = transformRuDateToISO(dateDif[0]);
+                dateDif[1] = transformRuDateToISO(dateDif[1]);
+                if (dateDif[0] && dateDif[1] && dateDif[0] < dateDif[1]) {
+                    cost *= Math.ceil((dateDif[1] - dateDif[0])/ (24 * 60 * 60 * 1000));
+                    $('form#draft_order #cost-counter').find('span').text((cost) + ' рублей');
+                } else {
+                    $(panel).find('span.dateErr').text('Неправильный диапозон дат');      
+                }
+            }
         });
         //  Отправка данных
         $(panel).find('button.btn_submit').click(function(){
@@ -320,12 +333,20 @@ var menuManager = new class menu {
         let form = $('form#draft_order');
         //  Формирование даты
         let data = {
-            carID       : self.checkID($(panel).attr('carId')),
-            from   : self.ConvertStringToDate($(form).find('input#startDate').val()),
-            to     : self.ConvertStringToDate($(form).find('input#endDate').val())
+            carID  : self.checkID($(panel).attr('carId')),
         };
-        //  Поле ошибок заполнения
         const err_line = $(panel).find('span.dataErr');
+
+        let date = $('#datepicker').val().split(' - ');
+        if (date.length != 2) {
+            $(panel).find('input#datepicker').focus();
+            $(err_line).text('Неправильно задана дата аренды');
+            return;
+        }
+        data.from = convertStringToDate(date[0]);
+        data.to = convertStringToDate(date[1]);
+        //  Поле ошибок заполнения
+        
         //  Проверка ID автомобиля
         if (!data.carID){
             $(err_line).text('Неверный CarID');
@@ -333,13 +354,13 @@ var menuManager = new class menu {
         }
         //  Проверка даты начала ренты
         if (!data.from){
-            $(panel).find('input#startDate').focus();
+            $(panel).find('input#datepicker').focus();
             $(err_line).text('Неправильная дата начала аренды');
             return;
         }
         //  Проверка даты окончания ренты
         if (!data.to){
-            $(panel).find('input#endDate').focus();
+            $(panel).find('input#datepicker').focus();
             $(err_line).text('Неправильная дата окончания аренды');
             return;
         }
@@ -618,3 +639,27 @@ $(document).ready(function(){
     menuManager.recordCounter();
     menuManager.changePager();
 });
+
+function transformRuDateToISO(ruDate) {
+    let temp = ruDate.split('.');
+    if (temp.length != 3)
+        return null;
+    temp = temp[1] + '.' + temp[0] + '.' + temp[2];
+    temp = new Date(Date.parse(temp));
+    if (isNaN(temp))
+        return null;
+    return temp;
+}
+
+function convertStringToDate(date){
+    date = String(date);
+    if (!date)
+        return null;
+    const dateParts = date.split('.');
+    if (!dateParts || dateParts.length != 3)
+        return null;
+    const year  = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[1]);
+    const day   = parseInt(dateParts[0]);
+    return day + '.' + month +'.' + year;
+}

@@ -1,3 +1,63 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
+div.filter-row {
+  position: relative;
+}
+div.filter-row div#car-filter {
+  position: fixed;
+  top: 10%;
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+}
+div.filter-row div#car-filter div.field {
+  width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin: 4px 12px;
+}
+div.filter-row div#car-filter div.field input {
+  width: 100%;
+}
+div.filter-row div#car-filter div.field select {
+  width: 100%;
+}
+div.filter-row div#car-filter div.field .label {
+  font-size: 16px;
+}
+div.filter-row div#car-filter div.field span {
+  color: #000;
+}
+div.filter-row div#car-filter div.field div.cost-field {
+  width: 45%;
+}
+div.filter-row div#car-filter div.field div.cost-field input {
+  width: 100%;
+}
+div.filter-row div#car-filter div.submit-field {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+div.filter-row div#car-filter div.submit-field div.submit {
+  width: 100px;
+  background: #29c230;
+  text-align: center;
+  padding: 5px;
+  border-radius: 3px;
+}
+div.filter-row div#car-filter div.submit-field div.submit span {
+  font-size: 14px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+div.filter-row div#car-filter.hidden-filter {
+  display: none;
+}

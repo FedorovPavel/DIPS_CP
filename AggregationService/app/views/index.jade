@@ -20,6 +20,50 @@ block list
                 option#min_record(counts=10) 10 
                 option#md_record(selected,counts=20) 20
                 option#lg_record(counts=30) 30
+      .col-md-2.filter-row
+        div#car-filter.hidden-filter
+          div.field
+            span.label Производитель
+            input#manufacture-filter
+          div.field
+            span.label Модель
+            input#model-filter
+          div.field
+            span.label Тип кузова
+            select#type-filter
+              option(selected, value ='') Не выбрано
+              option(value='sedan') Седан
+              option(value='hatchback') Хетчбек
+              option(value='SUV') Внедорожник
+              option(value='wagon') Универсал
+              option(value='van') Фургон
+              option(value='coupe') Купе
+              option(value='minivan') Минивен
+              option(value='other') Другое
+          div.field
+            span.label Тип трансмиссии
+            select#transmission-filter
+              option(selected, value ='') Не выбрано
+              option(value='auto') Автоматическая
+              option(value='manual') Механическая
+              option(value='robot') Роботизированная
+          div.field
+            span.label Количество дверей
+            input#doors-filter(type='number', min="1", max="20")
+          div.field
+            span.label Количество мест
+            input#person-filter(type='number', min="1", max="20")
+          div.field
+            span.label Стоимость
+            div.cost-field
+              span.sub-label От
+              input#min-cost(type='number', min=1)
+            div.cost-field
+              span.sub-label До
+              input#max-cost(type='number', min=2)
+          div.field.submit-field
+            div#filter-setting.submit 
+              span Поиск
 block templates 
 include car_template
 include errorTemplate
