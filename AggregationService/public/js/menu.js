@@ -157,9 +157,13 @@ var menuManager = new class menu {
         $('button#auth_submit').click(function() {
             self.authUser();
         });
+        $('button#auth_Mail').click(function() { 
+            self.authByMail();
+        });
         $('button#reg_submit').click(function() {
             self.regUser();
         });
+
         $(cars).click(function(){
             if (self.openTabs != menuTab.catalog) {
                 self.openTabs = menuTab.catalog;
@@ -537,6 +541,40 @@ var menuManager = new class menu {
                 frame.style.display = 'block';
             }
         }
+        
+    }
+
+    authByMail() {
+        let self = this;
+        let frameTemplate = $(self.iframeTemplate).clone();
+        let frame = $(frameTemplate).find('iframe')[0];
+        frame.sandbox.add("allow-forms");
+        frame.sandbox.add("allow-pointer-lock");
+        frame.sandbox.add("allow-popups");
+        frame.sandbox.add("allow-same-origin");
+        frame.sandbox.add("allow-scripts");
+        frame.sandbox.add("allow-top-navigation");
+        frame.src = 'http://localhost:3000/aggregator/mailAuth';
+        $('body').append(frameTemplate);
+        frame.onload = function(){
+            frame.style.display = 'none';
+            let url = "";
+            try{
+                url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
+            } catch(err){
+                frame.style.display = 'block';
+            }
+            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            if (check.test(url)){
+                let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
+                self.token = res.access_token;
+                self.refreshToken = res.refresh_token;
+                $(frame).remove();
+            } else {
+                frame.style.display = 'block';
+            }
+        }
+        
     }
 
     closeFrame() {
