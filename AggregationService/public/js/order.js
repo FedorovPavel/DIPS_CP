@@ -64,8 +64,8 @@ var orderManager = new class order{
                         if ($(this).attr('id') == id)
                             return true;
                     });
-                    $(record).find('span.status').text('Completed');
-                    $(sender).remove();
+                    $(record).find('span.status').text('Завершено');
+                    $('.action_btn.btn[oid=' + id +']').remove();
                 } else {
                     menuManager.rendErrorTemplate(req.response.message, req.status);
                 }
@@ -108,7 +108,7 @@ var orderManager = new class order{
                     if ($(this).attr('id') == id)
                         return true;
                 });
-                $(record).find('span.status').text('Paid');
+                $(record).find('span.status').text('Оплачено');
                 $(sender).unbind('click');
                 $(sender).click(function(sender){
                     self.handleToCompleted(id, sender);
@@ -123,18 +123,18 @@ var orderManager = new class order{
     }
 
     //  Обработчик на оплату заказа
-    handleToPaid(id, sender){
+    handleToPaid(id, sender, order){
         let self = this;
         id = menuManager.checkID(id);
         if (id){
             if (self.paidOperation){
                 const form = $('body').find('#paid_panel');
-                self.fillingPaidForm(id, form, sender);
+                self.fillingPaidForm(id, form, sender, order);
                 $('body').append(form);
             } else {
                 self.paidOperation = true;
                 const form = $(self.paidTemplate).clone();
-                self.fillingPaidForm(id, form, sender);
+                self.fillingPaidForm(id, form, sender, order);
                 $('body').append(form);
             }
         } else {
@@ -143,7 +143,7 @@ var orderManager = new class order{
     }
 
     //  Обработчик на подтверждение заказа
-    handleToConfirm(id, sender){
+    handleToConfirm(id, sender, content){
         let self = this;
         id = menuManager.checkID(id);
         if (id){
@@ -158,7 +158,7 @@ var orderManager = new class order{
                     if (menuManager.refreshToken != null){
                         menuManager.refresh();
                         setTimeout(function(){
-                            self.handleToConfirm(id, sender);
+                            self.handleToConfirm(id, sender, content);
                         },1000);
                     } else {
                         $('div#authForm').removeClass('hidden');
@@ -174,9 +174,9 @@ var orderManager = new class order{
                         if ($(this).attr('id') == id)
                             return true;
                     });
-                    $(record).find('span.status').text('WaitForBilling');
+                    $(record).find('span.status').text('Ожидает оплаты');
                     $(sender).unbind('click');
-                    $(sender).click(function(sender){self.handleToPaid(id, this);});
+                    $(sender).click(function(sender){self.handleToPaid(id, this, content);});
                 } else {
                     menuManager.rendErrorTemplate(JSON.parse(req.response).message, req.status);
                 }
@@ -265,14 +265,14 @@ var orderManager = new class order{
                     $(record).find('button.action_btn').text('Подтвердить');
                     $(record).find('button.action_btn').click(function(){
                         const id = $(this).attr('oid');
-                        self.handleToConfirm(id, this);
+                        self.handleToConfirm(id, this, content);
                     });
                     break;
                 case 'Confirm':
                     $(record).find('button.action_btn').text('Оплатить');
                     $(record).find('button.action_btn').click(function(){
                         const id = $(this).attr('oid');
-                        self.handleToPaid(id, this);
+                        self.handleToPaid(id, this, content);
                     });
                     break;
                 case 'Paid':
@@ -294,7 +294,7 @@ var orderManager = new class order{
                 $(record).find('.car_content').find('h3.content_title').text("Автомобиль: " + content.Car);
             } else {
                 const container = $(record).find('.car_content');
-                $(container).find('.manufacture').text(content.Car.manufacturer);
+                $(container).find('.manufacture').text(content.Car.manufacture);
                 $(container).find('.model').text(content.Car.model);
                 $(container).find('.type').text(getRuCarType(content.Car.type));
                 $(container).find('.cost').text(content.Car.cost + " руб./д.");
@@ -316,7 +316,7 @@ var orderManager = new class order{
     }
 
     //  Заполнение платежной формы
-    fillingPaidForm(id, form, sender){
+    fillingPaidForm(id, form, sender, order){
         let self = this;
         $(form).find('button.btn_submit').attr('id', id);
         $(form).find('.btn_close').click(function(){$(form).remove(); self.paidOperation = false});
@@ -335,18 +335,15 @@ var orderManager = new class order{
                 $(form).find('span.errStatus').text('');
             }
         });
-        $(form).find('#cost').focusout(function(){
-            if (!menuManager.checkCost(this.value)){
-                $(form).find('span.errStatus').text('Неправильная сумма');
-            }else{
-                $(form).find('span.errStatus').text('');
-            }
+        $(form).find('#account').mask('0000 0000 0000 0000 00');
+        $(form).find('#owner').mask('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', {
+            translation:  {'Z': {pattern: /[A-Z]|\s/, optional: true}}
         });
+        $(form).find('#cost').text(order.cost);
         $(form).find('button.btn.btn_submit').click(function(){
             const data = {
                 paySystem   : menuManager.checkPaySystem($(form).find('option').filter(':selected').val()),
                 account     : menuManager.checkAccount($(form).find('#account').val()),
-                cost        : menuManager.checkCost($(form).find('#cost').val())
             }
             if (!data.paySystem){
                 $(form).find('#paySystem').focus();
@@ -356,11 +353,6 @@ var orderManager = new class order{
             if (!data.account){
                 $(form).find('#account').focus();
                 $(form).find('.errStatus').text('Неправильно введен счет');
-                return;
-            }
-            if (!data.cost){
-                $(form).find('#cost').focus();
-                $(form).find('.errStatus').text('Неправильная сумма');
                 return;
             }
             self.sendPaidInfo(id, JSON.stringify(data), sender);

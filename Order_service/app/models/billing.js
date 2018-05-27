@@ -4,10 +4,6 @@ const mongoose = require('mongoose'),
 const BillingSchema = new Schema({
 	paySystem: String,
 	account: String,
-	cost: {
-		type: Number,
-		min: 0.0
-	},
 	created: Number
 });
 
@@ -27,8 +23,7 @@ BillingSchema.methods.toFullObject = function () {
 	const item = {
 		id: this._id.toString(),
 		paySystem: this.paySystem,
-		account: this.hashedAccount,
-		cost: this.cost,
+		account: this.account,
 		created: this.created
 	};
 	return item;

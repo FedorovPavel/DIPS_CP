@@ -158,6 +158,25 @@ module.exports = {
         }
         return main_function(ids, callback);
     },
+    rentCar: function (data, callback) {
+        let main_function = function(data, callback){
+            const url = _CatalogHost + '/' + data.id + '/rent';
+            const options = createOptions(url, "PUT", CatalogToken, null, data.uid);
+            return createAndSendPutWithFormHttpRequest(options, data, function (err, status, response) {
+                return responseHandlerObject(err, status, response, function (err, status, response) {
+                    const repeat = checkServicesInformationFromCatalog(status, response, main_function, data, callback);
+                    if (!repeat){
+                        if (status == 200)
+                            response = response.content;
+                        return callback(err, status, response);
+                    }
+                    return;
+                }); 
+            });
+        }
+        return main_function(data, callback);
+    },
+
     //  Orders methods
     createOrder: function (data, callback) {
         let main_function = function(data, callback){
@@ -229,6 +248,23 @@ module.exports = {
     orderConfirm: function (data, callback) {
         let main_function = function(data, callback){
             const url = _OrderHost + '/orders/' + data.order_id + '/confirm';
+            const options = createOptions(url, "PUT", OrderToken, null, data.userId);
+            return createAndSendPutWithFormHttpRequest(options, null, function (err, status, response) {    
+                return responseHandlerObject(err, status, response, function(err, status, response){
+                    const repeat = checkServicesInformationFromOrder(status, response, main_function, data, callback);
+                    if (!repeat)
+                        if (status == 200)
+                            response = response.content;
+                        return callback(err, status, response);
+                    return;
+                });
+            });
+        }
+        return main_function(data, callback);
+    },
+    revertConfirm: function (data, callback) {
+        let main_function = function(data, callback){
+            const url = _OrderHost + '/orders/' + data.order_id + '/confirm/revert';
             const options = createOptions(url, "PUT", OrderToken, null, data.userId);
             return createAndSendPutWithFormHttpRequest(options, null, function (err, status, response) {    
                 return responseHandlerObject(err, status, response, function(err, status, response){

@@ -313,7 +313,26 @@ var menuManager = new class menu {
         $(datepicker).datepicker({
             minDate: new Date(),
             range: true,
-            multipleDatesSeparator: " - "
+            multipleDatesSeparator: " - ",
+            onRenderCell: function (date, cellType) {
+                if (cellType == 'day') {
+                    let state =  false;
+                    date = date.getTime();
+                    for (let I = 0; I < car.rentDate.length; I++) {
+                        let from = car.rentDate[I].from;
+                        let to = car.rentDate[I].to;
+                        if (to == undefined || from == undefined)
+                            continue;
+                        if (date >= from && date <= to) {
+                            state = true;
+                            break;
+                        }
+                    }
+                    return {
+                        disabled: state
+                    }
+                }
+            }
         });
         $(datepicker).mask('00.00.00 - 00.00.00');
         $(datepicker).focusout(function(){
@@ -327,7 +346,7 @@ var menuManager = new class menu {
                 dateDif[1] = transformRuDateToISO(dateDif[1]);
                 if (dateDif[0] && dateDif[1] && dateDif[0] < dateDif[1]) {
                     cost *= Math.ceil((dateDif[1] - dateDif[0])/ (24 * 60 * 60 * 1000));
-                    $('form#draft_order #cost-counter').find('span').text((cost) + ' рублей');
+                    $('span.sum-cost').text((cost) + ' рублей');
                 } else {
                     $(panel).find('span.dateErr').text('Неправильный диапозон дат');      
                 }
@@ -454,11 +473,11 @@ var menuManager = new class menu {
 
     confirm_after_draft(panel, res){
         let self = this;
-        $(panel).find('.start_date').text(new Date(res.Lease.StartDate).toLocaleDateString());
-        $(panel).find('.end_date').text(new Date(res.Lease.EndDate).toLocaleDateString());
-        $(panel).find('.content').remove();
+        $(panel).find('.start_date').text(new Date(res.content.lease.from).toLocaleDateString());
+        $(panel).find('.end_date').text(new Date(res.content.lease.to).toLocaleDateString());
+        $(panel).find('.date-select').remove();
         $(panel).find('.button_field').remove();
-        $(panel).attr('resID', res.ID);
+        $(panel).attr('resID', res.content.id);
         $(panel).find('button.btn_confirm').click(function(){
             self.sendConfirmOrder(panel);
         });
@@ -504,6 +523,7 @@ var menuManager = new class menu {
                 let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
                 self.token = res.access_token;
                 self.refreshToken = res.refresh_token;
+                self.setTokens(res.access_token, res.refresh_token, 24 * 60 * 60 * 1000);
                 $(frameTemplate).remove();
             } else {
                 frame.style.display = 'block';
@@ -681,6 +701,23 @@ var menuManager = new class menu {
         }
         req.send();
     }
+
+    getTokens() {
+        let date = Date.now();
+        let created = Number(sessionStorage.getItem('created'));
+        let live = Number(sessionStorage.getItem('expires'));
+        // if (date - (created + live) < 0 ){
+            menuManager.token = sessionStorage.getItem('token');
+            menuManager.refreshToken = sessionStorage.getItem('refresh');
+        // }
+    }
+
+    setTokens(token, refresh, expires) {
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('refresh', refresh);
+        sessionStorage.setItem('expires', expires);
+        sessionStorage.setItem('created', Date.now());
+    }
 }();
 
 $(document).ready(function(){
@@ -688,6 +725,7 @@ $(document).ready(function(){
     menuManager.getReportsTemplate();
     menuManager.getIFrameTemplate();
     menuManager.bindHandleToHeader();
+    menuManager.getTokens();
     menuManager.recordCounter();
     menuManager.changePager();
 });

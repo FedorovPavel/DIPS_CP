@@ -46,12 +46,12 @@ var carManager = new class car {
       $(record).find('span.cost').text(content.cost + ' руб./д.');
       $(record).find('button.create_order').attr('carId', content.id);
       $(record).find('button.create_order').click(function (sender) {
-        // if (menuManager.checkAuth()) {
+        if (menuManager.checkAuth()) {
           let carId = $(this).attr('carId');
           menuManager.createDraftOrder(content);
-        // } else {
-        //   alert('Для заказа необходимо авторизоваться');
-        // }
+        } else {
+          alert('Для заказа необходимо авторизоваться');
+        }
       });
       $(menuManager.getList()).append(record);
     }

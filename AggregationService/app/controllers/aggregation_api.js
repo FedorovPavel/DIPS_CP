@@ -149,7 +149,6 @@ router.get('/mailCode', function(req, res, next){
 	});
 });
 
-
   // Get any cars
 router.get('/catalog', function(req, res, next){
   let page  = validator.checkPageNumber(req.query.page);
@@ -240,9 +239,14 @@ router.post('/orders/', function(req, res, next){
       };
       return statSender.sendInfoByDraftOrder(data);
     }
-    // param.cost = validator.checkCost(req.body.cost);
-    param.cost = 100;
-    return bus.createOrder(param, function(err, status, response){
+    return bus.getCar({
+      id: param.carID
+    }, function(err, status, response) {
+      if (err || status != 200){
+        return res.status(status).send(response);
+      }
+      param.cost = (Number(param.to.getTime()) - Number(param.from.getTime())) / (24 * 60 * 60 * 1000) * response.cost;
+      return bus.createOrder(param, function(err, status, response){
         res.status(status).send(response);
         const data = {
           status : status,
@@ -250,6 +254,7 @@ router.post('/orders/', function(req, res, next){
           entryData : param
         };
         return statSender.sendInfoByDraftOrder(data);
+      });
     });
   });
 });
@@ -331,7 +336,23 @@ router.put('/orders/confirm/:id', function(req, res, next){
       userId : info.id
     };
     return bus.orderConfirm(data, function(err, status, response){
-      return res.status(status).send(response);
+      if (err || status != 200) {
+        return res.status(status).send(response);  
+      }
+      let rentInfo = {
+        id: response.carId,
+        uid: info.id,
+        from: response.lease.from,
+        to: response.lease.to
+      };
+      return bus.rentCar(rentInfo, function(err, status, response) {
+        if (err || status != 200) {
+          return bus.revertConfirm(data, function(err, status, response) {
+            return res.status(status).send(response);
+          });
+        }
+        return res.status(status).send(response);
+      });
     });
   });
 });
@@ -356,15 +377,10 @@ router.put('/orders/paid/:id', function(req, res, next){
     if (!data.account)
       return res.status(400).send({status : 'Error', message : 'Bad request : Invalid Account'});
 
-    data.cost  = validator.checkCost(req.body.cost);
-    if (typeof(data.cost) == 'undefined')
-      return res.status(400).send({status : 'Error', message : 'Bad request : Cost is undefined'});
-    if (!data.cost)
-      return res.status(400).send({status : 'Error', message : 'Bad request : Invalid cost'});
     return bus.getOrder(checkData, function(err, status, pre_order){
       if (err)
         return res.status(status).send(pre_order);
-      if (pre_order && pre_order.status == 'Confirm'){
+      if (pre_order && ((pre_order.status == 'Confirm' )||((pre_order.status.toLowerCase() == 'waitforbillings')))){
         let transferData = {
           order_id : oid,
           userId : info.id,
@@ -374,7 +390,7 @@ router.put('/orders/paid/:id', function(req, res, next){
           if (err || status != 201)
             return res.status(status).send(response);
           if (response && status == 201){
-            return res.status(status, send(response));
+            return res.status(status).send(response);
           }
         });
       } else {

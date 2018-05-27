@@ -131,8 +131,8 @@ router.put('/:id/rent', function (req, res, next) {
     if (!uid || uid == undefined) {
       return res.status(400).send(responseTemplate('Error', 'Bad request: userId is undefined', scope));
     }
-    const from = Date.parse(req.body.from);
-    const to = Date.parse(req.body.to);
+    const from = Number(req.body.from);
+    const to = Number(req.body.to);
     if (!from || !to || from == undefined || to == undefined) {
       return res.status(400).send(responseTemplate('Error', 'Bad request: rent data is undefined', scope));
     }
@@ -140,8 +140,8 @@ router.put('/:id/rent', function (req, res, next) {
       state: 0,
       rentDate: {
         renter: uid,
-        from: new Date(from).getTime(),
-        to: new Date(to).getTime()
+        from: from,
+        to: to
       }
     };
     return catalog.updateCarRent(id, updateFields, function (err, car) {

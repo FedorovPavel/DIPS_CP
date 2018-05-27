@@ -8,8 +8,8 @@ div#order_paid_template
                     h2.title Оформеление платежа
                 .col-sm-12
                     .row
-                        .col-sm-2.col-sm-offset-2
-                            span.head_label Система платежа
+                        .col-sm-4.col-sm-offset-2
+                            span.head_label Платежная система
                         .col-sm-6
                             select#paySystem
                                 option(value='Сбербанк' selected) Сбербанк
@@ -20,16 +20,22 @@ div#order_paid_template
                                 option(value='Альфа-банк') Альфа-банк
                 .col-sm-12  
                     .row
-                        .col-sm-2.col-sm-offset-2
+                        .col-sm-4.col-sm-offset-2
                             span.head_label Расчетный счет
                         .col-sm-6
                             input#account
                 .col-sm-12
+                .col-sm-12  
                     .row
-                        .col-sm-2.col-sm-offset-2
-                            span.head_label Стоимость
+                        .col-sm-4.col-sm-offset-2
+                            span.head_label Имя владельца
                         .col-sm-6
-                            input#cost(value=10, min=10, type='number')
+                            input#owner
+                    .row
+                        .col-sm-4.col-sm-offset-2
+                            span.head_label Запрашиваемая сумма
+                        .col-sm-6
+                            span#cost
                 .col-sm-12
                     span.errStatus
                 .col-sm-12

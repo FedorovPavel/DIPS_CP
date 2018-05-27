@@ -99,6 +99,26 @@ router.put('/:id/confirm', function (req, res, next) {
 	});
 });
 
+router.put('/:id/confirm/revert', function (req, res, next) {
+	return passport.checkServiceAuthorization(req, res, function(scope){
+		const id = req.params.id;
+		const uid = getUserId(req);
+		return orderManager.changeOrderStatus(uid, id, -1, function (err, result) {
+			if (err) {
+				if (err.kind == "ObjectId")
+					return res.status(400).send(responseTemplate('Error', { message: 'Bad request: bad ID' }, scope));
+				else
+					return res.status(400).send(responseTemplate('Error', { message: err }, scope));
+			} else {
+				if (result) {
+					return res.status(200).send(responseTemplate('Ok', result, scope));
+				}
+				return res.status(404).send(responseTemplate('Error', { message: 'Not found order' }, scope));
+			}
+		});
+	});
+});
+
 router.put('/:id/paid', function (req, res, next) {
 	return passport.checkServiceAuthorization(req, res, function(scope){
 		const id = req.params.id;

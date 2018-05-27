@@ -135,6 +135,30 @@ OrderSchema.statics.setConfirm = function (uid, id, callback) {
 	});
 };
 
+OrderSchema.statics.revertConfirm = function (uid, id, callback) {
+	return this.findOne({ _id: id, userId: uid }, function (err, order) {
+		if (err)
+			return callback(err, null);
+		else {
+			if (order) {
+				if (order.status == 'Confirm') {
+					order.status = 'Draft';
+					return order.save(function (err, res) {
+						if (err)
+							return callback(err, null);
+						else
+							return callback(null, res.toFullObject());
+					});
+				} else {
+					return callback({ message: "Status don't right" }, null);
+				}
+			} else {
+				return callback(null, null);
+			}
+		}
+	});
+};
+
 OrderSchema.statics.setPaid = function (uid, id, info, callback) {
 	const mongoose = require('mongoose');
 	const model = mongoose.model('Billing');
@@ -201,6 +225,7 @@ OrderSchema.methods.toFullObject = function () {
 			from: this.lease.from,
 			to: this.lease.to
 		},
+		cost: this.cost,
 		created: this.created
 	};
 	if (this.billing != undefined) {
@@ -235,6 +260,9 @@ const manager = new class {
 
 	changeOrderStatus(uid, id, state, callback, info = undefined) {
 		switch (state) {
+			case -1: {
+				return orderORM.revertConfirm(uid, id, callback);
+			}
 			case 1: {
 				return orderORM.setConfirm(uid, id, callback);
 			}
