@@ -87,8 +87,8 @@ CatalogSchema.statics.getCar = function (id, cb) {
   });
 }
 
-CatalogSchema.statics.getCount = function (callback) {
-  return this.count({}, function (err, count) {
+CatalogSchema.statics.getCount = function (query, callback) {
+  return this.count(query, function (err, count) {
     if (err) {
       return callback(err, null);
     }
@@ -246,8 +246,8 @@ let middleware = new class {
    * Get count records on DB
    * @param {function} callback callback with work result
    */
-  getCount(callback) {
-    return catalogModel.getCount(function (err, count) {
+  getCount(query = {}, callback) {
+    return catalogModel.getCount(query, function (err, count) {
       if (err) {
         return callback(err, null);
       }
@@ -502,3 +502,82 @@ function transformFilterToQuery(filters) {
   }
   return queryParam;
 }
+
+function initCatalog() {
+  return catalogModel.find({}, (err, models) => {
+    if (err) {
+      return;
+    }
+    if (models.length < 1000){
+      let documents = [];
+      for (let I = 0; I < 1000; I++){
+        documents.push(getRandomModel());
+      }
+      return catalogModel.collection.insertMany(documents, function(err, docs){
+        if (err) {
+          return;
+        }
+        return;
+      });
+    }
+  });
+
+  function getRandomModel() {
+    let manufacturer = ['LADA (ВАЗ)', 'Audi', 'BMW', 'Cadillac','Chery',
+      'Chevrolet',
+      'Chrysler',
+      'Citroen',
+      'Daewoo',
+      'Datsun',
+      'Dodge',
+      'Fiat',
+      'Ford',
+      'Honda',
+      'Hyundai',
+      'Infiniti',
+      'Jaguar',
+      'Jeep',
+      'Kia',
+      'Lexus',
+      'Mazda',
+      'Mercedes-Benz',
+      'Mitsubishi',
+      'Nissan',
+      'Opel',
+      'Peugeot',
+      'Porsche',
+      'Renault',
+      'Skoda',
+      'Subaru',
+      'Suzuki',
+      'Toyota',
+      'Volkswagen',
+      'Volvo'];
+    let model = [
+      'Almera', 'Almera Classic', 'Juke', 'Murano', 'Pathfinder', 'Primera', 'Qashqai', 'Teana' , 'Terrano', 'Tiida', 'X-Trail',     
+      'Fabia', 'Fabia RS', 'Felicia', 'Kodiaq', 'Octavia', 'Octavia RS', 'Rapid', 'Roomster', 'Superb', 'Yeti',
+      'Accent', 'Creta', 'Elantra', 'Getz', 'i30', 'i40', 'ix35', 'Santa Fe', 'Solaris', 'Sonata', 'Tucson'
+    ];
+    let type = ['sedan', 'hatchback', 'SUV', 'wagon', 'van', 'coupe', 'minivan', 'other'];
+    let transmission = ['auto', 'manual', 'robot'];
+
+    let indexMa = Math.round(Math.random() * manufacturer.length);
+    let indexMo = Math.round(Math.random() * model.length);
+    let indexT = Math.round(Math.random() * type.length);
+    let doors = Math.round(Math.random() * (9) + 1);
+    let person = Math.round(Math.random() * (20) + 1);
+    let indexTr = Math.round(Math.random() * transmission.length);
+    let res = {
+      manufacture: manufacturer[indexMa],
+      model: model[indexMo],
+      type: type[indexT],
+      doors: doors,
+      person: person,
+      transmission: transmission[indexTr],
+      cost : Math.round(Math.random() * 1000 + 100)
+    }
+    return res;
+  }
+};
+
+initCatalog();
