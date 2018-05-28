@@ -434,6 +434,7 @@ router.get('/reports/all', function(req, res, next){
 
 router.get('/admin/getUserRole', function(req, res, next){
   	return checkAuthAndGetUserInfo(req, res, function(info){
+		console.log(info);
 		if (!info || !info.role || info.role.toLowerCase() != 'admin'){
 			return res.status(404).send({status : 'Error' , message : "Page not found"});
 	  	}
@@ -449,7 +450,6 @@ function checkAuthAndGetUserInfo(req, res, callback){
   const info = {
     token : getToken(req)
   }
-  console.log(info);
   if (!info.token || info.token.length == 0 || typeof(info.token) === 'undefined')
     return res.status(401).send({status : 'Non authorize', message : 'Invalid token'});
   return bus.getUserInfo(info, function(err, status, response){

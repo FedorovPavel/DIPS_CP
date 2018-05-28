@@ -150,10 +150,11 @@ var menuManager = new class menu {
     //  Инициализация меню
     bindHandleToHeader(){
         var self = this;
-        const menuPills = $('ul#nav-pills');    
-        const cars      = menuPills.find('li#automobile-pill');
-        const orders    = menuPills.find('li#orders-pill');
-        const report    = menuPills.find('li#report-pill');
+        const menuPills  = $('ul#nav-pills');    
+        const cars       = menuPills.find('li#automobile-pill');
+        const orders     = menuPills.find('li#orders-pill');
+		const report     = menuPills.find('li#report-pill');
+		const carmanager = menuPills.find('li#carmanager-pill');
         $('button#auth_submit').click(function() {
             self.authUser();
         });
@@ -191,6 +192,22 @@ var menuManager = new class menu {
             self.page = 0;            
             self.changePager(); 
             self.draftExecution = false;
+		});
+		
+		$(carmanager).click(function(){
+            $(menuPills).find('li').removeClass('active');
+            $(this).addClass('active');
+
+			let frameTemplate = $(self.iframeTemplate).clone();
+			let frame = $(frameTemplate).find('iframe')[0];
+			frame.sandbox.add("allow-forms");
+			frame.sandbox.add("allow-pointer-lock");
+			frame.sandbox.add("allow-popups");
+			frame.sandbox.add("allow-same-origin");
+			frame.sandbox.add("allow-scripts");
+			frame.sandbox.add("allow-top-navigation");
+			frame.src = 'http://localhost:3000/aggregator/admin/carmanager';
+			$('body').append(frameTemplate);
         });
     }
 
