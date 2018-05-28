@@ -443,6 +443,18 @@ router.get('/admin/getUserRole', function(req, res, next){
 	});
 });
 
+router.delete('/admin/car/:id', function(req, res, next){
+	return checkAuthAndGetUserInfo(req, res, function(info){
+	  	if (!info || !info.role || info.role.toLowerCase() != 'admin'){
+		  	return res.status(404).send({status : 'Error' , message : "Page not found"});
+		}
+
+		bus.deleteCar(req.params.id, function(err, status, response) {
+			return res.status(200).send({status: 'Ok'});
+		});
+  });
+});
+
 function checkAuthAndGetUserInfo(req, res, callback){
   let getToken = function getBearerToken(req){
     return req.headers.authorization.split(' ')[1];

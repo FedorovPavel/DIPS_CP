@@ -1,0 +1,83 @@
+.carmanager-container {
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+	height: 100%;
+
+	.car {
+		display: inline-block;
+		vertical-align: top;
+		width: ~'calc(100% - 22px)';
+		height: auto;
+		margin: 10px;
+		margin-top: 0;
+		border: 1px solid black;
+		border-radius: 5px;
+		border: 1px solid #0288d1;
+
+		.c-row {
+			display: inline-block;
+			vertical-align: top;
+			width: ~'calc(100% - 5px)';
+			height: auto;
+			margin-top: 3px;
+			margin-bottom: 3px;
+			margin-left: 5px;
+
+			span {
+				display: inline-block;
+				vertical-align: top;
+				font-size: 16px;
+				font-weight: 700;
+			}
+
+			span:first-child {
+				font-size: 16px;
+				font-weight: 400;
+				width: 150px;
+			}
+		}
+
+		.c-row.header-row {
+			background: #0288d1;
+			margin: 0;
+			width: 100%;
+			
+			span {
+				color: white;
+				font-size: 20px;
+				width: auto;
+				margin-left: 5px;
+				margin-right: 5px;
+			}
+		}
+
+		.delete-button {
+			display: inline-block;
+			vertical-align: top;
+			width: 100px;
+			height: 30px;
+			border-radius: 4px;
+			background: #0288d1;
+			text-align: center;
+			margin-top: 5px;
+			margin-left: 5px;
+			margin-bottom: 5px;
+			cursor: pointer;
+
+			.fakeelem {
+				display: inline-block;
+				vertical-align: middle;
+				width: 0;
+				height: 100%;
+			}
+
+			span {
+				display: inline-block;
+				vertical-align: middle;
+				color: white;
+				font-size: 16px;
+			}
+		}
+	}
+}

@@ -508,9 +508,9 @@ function initCatalog() {
     if (err) {
       return;
     }
-    if (models.length < 1000){
+    if (models.length < 3){
       let documents = [];
-      for (let I = 0; I < 1000; I++){
+      for (let I = 0; I < 3; I++){
         documents.push(getRandomModel());
       }
       return catalogModel.collection.insertMany(documents, function(err, docs){

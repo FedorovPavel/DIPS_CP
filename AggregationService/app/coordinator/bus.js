@@ -177,6 +177,23 @@ module.exports = {
             });
         }
         return main_function(data, callback);
+	},
+	deleteCar: function (id, callback) {
+        let main_function = function(data, callback){
+            const url = _CatalogHost + '/' + id;
+            const options = createOptions(url, "DELETE", CatalogToken, null, null);
+            return createAndSendDeleteHttpRequest(options, function (err, status, response) {
+                return responseHandlerObject(err, status, response, function (err, status, response) {
+                    const repeat = checkServicesInformationFromCatalog(status, response, main_function, id, callback);
+                    if (!repeat){
+                        if (status == 200)
+                        	return callback(err, status, response);
+                    }
+                    return;
+                }); 
+            });
+        }
+        return main_function(id, callback);
     },
 
     //  Orders methods

@@ -1,3 +1,34 @@
 include layout
+link(rel='stylesheet', href='/css/carmanager.css')
 
-div.carmanager-conainer
+div.carmanager-container
+	- for(var i = 0; i < cars.length; i++) {
+		div.car(car-id = '#{cars[i].id}')
+			div.c-row.header-row
+				span Автомобиль:
+				span #{cars[i].id}
+			div.c-row
+				span Производитель:
+				span #{cars[i].manufacture}
+			div.c-row
+				span Модель:
+				span #{cars[i].model}
+			div.c-row
+				span Тип:
+				span #{cars[i].type}
+			div.c-row
+				span Кол-во дверей:
+				span #{cars[i].doors}
+			div.c-row
+				span Мест:
+				span #{cars[i].person}
+			div.c-row
+				span КП:
+				span #{cars[i].transmission}
+			div.c-row
+				span Стоимость:
+				span #{cars[i].cost}
+			div.delete-button(onclick='deleteCar("#{cars[i].id}")')
+				div.fakeelem
+				span Удалить
+	- }

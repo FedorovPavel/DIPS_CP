@@ -20,6 +20,6 @@ router.get('/aggregator/admin/carmanager', function(req, res, next){
 
 	return bus.getCars(dataContainer, function(err, statusCode = 500, carData){
 		console.log(JSON.stringify(carData));
-		return res.render('carmanager', {});
+		return res.render('carmanager', {cars: carData.content.cars});
 	});
 });
