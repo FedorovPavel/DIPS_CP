@@ -35,7 +35,7 @@ router.get('/cars', function (req, res, next) {
       if (err) {
         return res.status(500).send(responseTemplate('Error', err, scope));
       }
-      return catalog.getCount(function (err, countRecord) {
+      return catalog.getCount(filters,function (err, countRecord) {
         if (err) {
           return res.status(500).send(responseTemplate('Error', 'Undefined count elements', scope));
         }
@@ -43,7 +43,7 @@ router.get('/cars', function (req, res, next) {
           cars: cars,
           info: {
             count: countRecord,
-            pages: Math.ceil(countRecord / count) - 1,
+            pages: Math.ceil(countRecord / count),
             current: page,
             limit: count
           }
@@ -188,7 +188,6 @@ router.delete('/:id/rent/:rid', function (req, res, next) {
     });
   });
 });
-
 
 function getFilters(req) {
   let filters = {
