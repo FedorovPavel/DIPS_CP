@@ -3,7 +3,7 @@ var express   = require('express'),
 	bus       = require('./../coordinator/bus');
 
 module.exports = function (app) {
-    app.use('/', router);
+	app.use('/aggregator', router);
 };
 
 router.get('/', function(req, res, next){
@@ -11,7 +11,7 @@ router.get('/', function(req, res, next){
 	console.log('rendered index');
 });
 
-router.get('/aggregator/admin/carmanager', function(req, res, next){
+router.get('/admin/carmanager', function(req, res, next){
 	const dataContainer = {
 		page : 0,
 		count : 999999,

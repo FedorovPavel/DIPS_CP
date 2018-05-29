@@ -48,7 +48,7 @@ router.post('/login', function(req, res, next){
   });
 });
 
-router.post('/registration', function(req, res, next){
+router.post('/registration/confirm', function(req, res, next){
   const data = {
     appId         : validator.checkAvailability(req.body.app_id),
     login         : req.body.login,
@@ -58,9 +58,7 @@ router.post('/registration', function(req, res, next){
   if (!data.appId)
     return res.status(401).send({status : "Error", message : "One of parametrs is undefined"});
   if (!data.login || !data.password || !data.rpassword){
-    return res.status(401).render('auth',{
-      response_type : data.responseType,
-      redirect_uri : data.redirect_uri,
+    return res.status(301).render('reg',{
       app_id : data.appId
     });
   }
