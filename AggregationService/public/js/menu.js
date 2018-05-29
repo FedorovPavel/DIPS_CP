@@ -525,7 +525,7 @@ var menuManager = new class menu {
         frame.sandbox.add("allow-same-origin");
         frame.sandbox.add("allow-scripts");
         frame.sandbox.add("allow-top-navigation");
-        frame.src = 'http://localhost:3000/aggregator/auth';
+        frame.src = 'http://23.105.226.186/aggregator/auth';
         $('body').append(frameTemplate);
         frame.onload = function(){
             frame.style.display = 'none';
@@ -535,7 +535,7 @@ var menuManager = new class menu {
             } catch(err){
                 frame.style.display = 'block';
             }
-            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            const check = /aggregator\/code/;
             if (check.test(url)){
                 let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
                 self.token = res.access_token;
@@ -558,7 +558,7 @@ var menuManager = new class menu {
         frame.sandbox.add("allow-same-origin");
         frame.sandbox.add("allow-scripts");
         frame.sandbox.add("allow-top-navigation");
-        frame.src = 'http://localhost:3000/aggregator/registration';
+        frame.src = 'http://23.105.226.186/aggregator/registration';
         $('body').append(frameTemplate);
         frame.onload = function(){
             frame.style.display = 'none';
@@ -568,7 +568,7 @@ var menuManager = new class menu {
             } catch(err){
                 frame.style.display = 'block';
             }
-            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            const check = /auth\/registration\/confirm/;
             if (check.test(url)){
                 let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
                 self.token = res.access_token;
@@ -591,7 +591,7 @@ var menuManager = new class menu {
         frame.sandbox.add("allow-same-origin");
         frame.sandbox.add("allow-scripts");
         frame.sandbox.add("allow-top-navigation");
-        frame.src = 'http://localhost:3000/aggregator/mailAuth';
+        frame.src = 'http://23.105.226.186/aggregator/mailAuth';
         $('body').append(frameTemplate);
         frame.onload = function(){
             frame.style.display = 'none';
@@ -601,7 +601,7 @@ var menuManager = new class menu {
             } catch(err){
                 frame.style.display = 'block';
             }
-            const check = /http:\/\/localhost:3000\/aggregator\/code/;
+            const check = /aggregator\/mailCode/;
             if (check.test(url)){
                 let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
                 self.token = res.access_token;
