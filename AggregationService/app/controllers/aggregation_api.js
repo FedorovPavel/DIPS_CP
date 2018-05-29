@@ -73,15 +73,15 @@ setInterval(function(){
 
 //  Auth
 router.get('/auth', function(req, res, next){
-  const authUrl = "http://localhost:3001/auth/authorization?";
-  const aggregatorUrl = "http://localhost:3000/aggregator/code";
+  const authUrl = "http://23.105.226.186/auth/authorization?";
+  const aggregatorUrl = "http://23.105.226.186/aggregator/code";
   const queryParametrs = ['response_type=code', 'app_id=' + appId, 'redirect_uri='+ aggregatorUrl];
   const url = authUrl + queryParametrs.join('&');
   return res.status(302).redirect(url);
 });
 
 router.get('/registration', function(req, res, next) {
-  const authUrl = 'http://localhost:3001/auth/registration?';
+  const authUrl = 'http://23.105.226.186/auth/registration?';
   const url = authUrl + 'app_id=' + appId;
   return res.status(302).redirect(url);
 });
