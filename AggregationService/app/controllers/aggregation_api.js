@@ -100,7 +100,7 @@ router.post('/authByToken', function(req, res ,next){
       response : response,
       entryData : data
     };
-    return;// statSender.sendAuthorizationByTokenInfo(info);
+    return statSender.sendAuthorizationByTokenInfo(info);
   });
 });
 
@@ -117,7 +117,7 @@ router.get('/code', function(req, res, next){
       status : status,
       response : response
     };
-    return;// statSender.sendAuthorizationInfo(info);
+    return statSender.sendAuthorizationInfo(info);
   });
 });
 
@@ -145,7 +145,7 @@ router.get('/mailCode', function(req, res, next){
 		status : status,
 		response : response
 	  };
-	  return;// statSender.sendAuthorizationInfo(info);
+	  return statSender.sendAuthorizationInfo(info);
 	});
 });
 
@@ -217,7 +217,7 @@ router.post('/orders/', function(req, res, next){
         response : {status : 'Error', message : 'Bad request : Invalid car ID'},
         entryData : param
       };
-      return;// statSender.sendInfoByDraftOrder(data);
+      return statSender.sendInfoByDraftOrder(data);
     }
     param.from = validator.ConvertStringToDate(req.body.from);
     if (!param.from){
@@ -227,7 +227,7 @@ router.post('/orders/', function(req, res, next){
         response : {status : 'Error', message : 'Bad request : Invalid start rent date'},
         entryData : param
       };
-      return;// statSender.sendInfoByDraftOrder(data);
+      return statSender.sendInfoByDraftOrder(data);
     }
     param.to = validator.ConvertStringToDate(req.body.to);
     if (!param.to){
@@ -237,7 +237,7 @@ router.post('/orders/', function(req, res, next){
         response : {status : 'Error', message : 'Bad request : Invalid end rent date'},
         entryData : param
       };
-      return;// statSender.sendInfoByDraftOrder(data);
+      return statSender.sendInfoByDraftOrder(data);
     }
     return bus.getCar({
       id: param.carID
@@ -253,7 +253,7 @@ router.post('/orders/', function(req, res, next){
           response : response,
           entryData : param
         };
-        return;// statSender.sendInfoByDraftOrder(data);
+        return statSender.sendInfoByDraftOrder(data);
       });
     });
   });

@@ -65,8 +65,8 @@ router.post('/registration/confirm', function(req, res, next){
   return passport.createUser(data, 'user', function(err, status, result){
     if (err)
       return res.status(status).send(err);
-    return res.status(200).render('confirmReg',{
-      tokens: result
+    return res.status(200).send({
+      content: result
     });
   });
 });
