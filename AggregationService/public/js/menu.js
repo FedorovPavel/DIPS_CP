@@ -206,6 +206,7 @@ var menuManager = new class menu {
 			frame.sandbox.add("allow-same-origin");
 			frame.sandbox.add("allow-scripts");
 			frame.sandbox.add("allow-top-navigation");
+			frame.sandbox.add("allow-modals");
 			frame.src = 'http://localhost:3000/aggregator/admin/carmanager';
 			$('body').append(frameTemplate);
         });

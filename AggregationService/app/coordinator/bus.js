@@ -178,6 +178,23 @@ module.exports = {
         }
         return main_function(data, callback);
 	},
+	createCar: function (carInfo, callback) {
+        let main_function = function(data, callback){
+            const url = _CatalogHost + '/';
+            const options = createOptions(url, "POST", CatalogToken, null, null);
+            return createAndSendHttpPostRequest(options, carInfo, function (err, status, response) {
+                return responseHandlerObject(err, status, response, function (err, status, response) {
+                    const repeat = checkServicesInformationFromCatalog(status, response, main_function, carInfo, callback);
+                    if (!repeat){
+                        if (status == 201)
+                        	return callback(err, status, response);
+                    }
+                    return;
+                }); 
+            });
+        }
+        return main_function(carInfo, callback);
+    },
 	deleteCar: function (id, callback) {
         let main_function = function(data, callback){
             const url = _CatalogHost + '/' + id;

@@ -72,3 +72,77 @@
   color: white;
   font-size: 16px;
 }
+.carmanager-container .car-create {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 22px);
+  height: auto;
+  margin: 10px;
+  margin-top: 0;
+  border: 1px solid black;
+  border-radius: 5px;
+  border: 1px solid #0288d1;
+}
+.carmanager-container .car-create .c-row {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 5px);
+  height: auto;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-left: 5px;
+}
+.carmanager-container .car-create .c-row span {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 16px;
+  font-weight: 400;
+  width: 200px;
+}
+.carmanager-container .car-create .c-row select {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
+.carmanager-container .car-create .c-row input {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
+.carmanager-container .car-create .c-row.header-row {
+  background: #0288d1;
+  margin: 0;
+  width: 100%;
+}
+.carmanager-container .car-create .c-row.header-row span {
+  color: white;
+  font-size: 20px;
+  width: auto;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.carmanager-container .car-create .create-button {
+  display: inline-block;
+  vertical-align: top;
+  width: 100px;
+  height: 30px;
+  border-radius: 4px;
+  background: #0288d1;
+  text-align: center;
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+.carmanager-container .car-create .create-button .fakeelem {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 100%;
+}
+.carmanager-container .car-create .create-button span {
+  display: inline-block;
+  vertical-align: middle;
+  color: white;
+  font-size: 16px;
+}

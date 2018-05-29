@@ -2,6 +2,44 @@ include layout
 link(rel='stylesheet', href='/css/carmanager.css')
 
 div.carmanager-container
+	div.car-create
+		div.c-row.header-row
+			span Добавление автомобиля
+		div.c-row
+			span Производитель:
+			input#acc-manufacture(name='manufacture' type='text')
+		div.c-row
+			span Модель:
+			input#acc-model(name='model' type='text')
+		div.c-row
+			span Тип:
+			select#acc-type(name="type")
+				option(value="sedan") Седан
+				option(value="hatchback") Хетчбэк
+				option(value="SUV") Внедорожник
+				option(value="wagon") Универсал
+				option(value="van") Фургон
+				option(value="coupe") Купе
+				option(value="minivan") Минивен
+				option(value="other") Другое
+		div.c-row
+			span Кол-во дверей:
+			input#acc-doors(name='doors' type='number')
+		div.c-row
+			span Мест:
+			input#acc-person(name='person' type='number')
+		div.c-row
+			span КП:
+			select#acc-transmission(name="transmission")
+				option(value="auto") Автомат
+				option(value="manual") Ручная
+				option(value="robot") Робот
+		div.c-row
+			span Стоимость:
+			input#acc-cost(name='cost' type='number')
+		div.create-button(onclick='createCar(this)')
+			div.fakeelem
+			span Добавить
 	- for(var i = 0; i < cars.length; i++) {
 		div.car(car-id = '#{cars[i].id}')
 			div.c-row.header-row
