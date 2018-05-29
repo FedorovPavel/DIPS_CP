@@ -7,6 +7,12 @@ module.exports = function (app) {
 	app.use('/orders', router);
 };
 
+router.head('/live/service', function (req, res, next) {
+	return passport.checkServiceAuthorization(req, res, function(scope) {
+		return res.status(200).send(responseTemplate('Ok', '' , scope));
+	}); 
+});
+
 router.get('/', function (req, res, next) {
 	return passport.checkServiceAuthorization(req, res, function(scope){
 		let page = req.query.page;
