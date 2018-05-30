@@ -7,7 +7,14 @@ module.exports = function (app) {
 };
 
 router.get('/', function(req, res, next){
-	res.render('index');
+	if(!req.query.mailResponse)
+		res.render('index');
+	else
+		res.render('index', {
+			isRedirectFromMail : true,
+			mailResponse: JSON.parse(req.query.mailResponse)
+		});
+
 	console.log('rendered index');
 });
 
@@ -33,15 +40,7 @@ router.get('/mailCode', function(req, res, next){
 	};
 
 	return bus.getMailToken(info, function(err, status, response){
-		res.render('index', {
-			isRedirectFromMail : true,
-			mailResponse: response
-		});
-	  bus.saveMailTokensToAuth(response);
-	  const info = {
-		status : status,
-		response : response
-	  };
-	  return;
+		res.redirect('/aggregator?mailResponse='+JSON.stringify(response));
+	  	bus.saveMailTokensToAuth(response);
 	});
 });

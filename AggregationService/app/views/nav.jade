@@ -18,8 +18,10 @@ div.navbar-wrapper
                 div#non-auth-field
                     div.login
                         button#auth_submit.button.auth-button Войти
-						- if(isRedirectFromMail)
-                        	button#auth_Mail.button.mail-button Mail
-						else
-							button#auth_Mail.button.mail-button(isRedirectFromMail='#{isRedirectFromMail}' mailResponse='#{mailResponse}') Mail
+                        - if(!isRedirectFromMail) {
+                            button#auth_Mail.button.mail-button Mail
+                        - }
+                        - else {
+                            button#auth_Mail.button.mail-button(isRedirectFromMail='#{isRedirectFromMail}' mailResponse='#{JSON.stringify(mailResponse)}') Mail
+                        - }
                     button#reg_submit.button.reg-button Регистрация

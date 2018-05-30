@@ -724,6 +724,9 @@ var menuManager = new class menu {
 		if($('#auth_Mail').attr('isRedirectFromMail')) {
 			var mailInfo = JSON.parse($('#auth_Mail').attr('mailResponse'));
 			this.setTokens(mailInfo.access_token, mailInfo.refresh_token, 24 * 60 * 60 * 1000);
+
+			var clean_uri = location.protocol + "//" + location.host + location.pathname;
+			window.history.replaceState({}, document.title, clean_uri);
 		}
 	}
 
@@ -752,7 +755,8 @@ $(document).ready(function(){
     menuManager.bindHandleToHeader();
     menuManager.getTokens();
     menuManager.recordCounter();
-    menuManager.changePager();
+	menuManager.changePager();
+	menuManager.mailAuthCheck();
 });
 
 function transformRuDateToISO(ruDate) {
