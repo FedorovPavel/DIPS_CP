@@ -229,13 +229,13 @@ function validateOrder(info){
     let res = "";
     if (info.status != 201)
         res += 'Invalid message: ';
-    if (typeof(info.response.CarID) == 'undefined')
-        return res += 'CarID is undefined';
-    if (typeof(info.response.UserID) == 'undefined')
-        return res += 'UserID is undefined';
-    if (!date.test(info.response.Lease.StartDate))
+    if (typeof(info.response.carId) == 'undefined')
+        return res += 'carId is undefined';
+    if (typeof(info.response.userId) == 'undefined')
+        return res += 'userId is undefined';
+    if (!date.test(info.response.lease.from))
         return res += 'Invalid Start Date';
-    if (!date.test(info.response.Lease.EndDate))
+    if (!date.test(info.response.Lease.to))
         return res += 'Invalid End Date';
     if (info.response.Status != status)
         return res += 'Invalid order Status';
