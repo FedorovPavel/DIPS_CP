@@ -23,3 +23,25 @@ router.get('/admin/carmanager', function(req, res, next){
 		return res.render('carmanager', {cars: carData.content.cars});
 	});
 });
+
+router.get('/mailCode', function(req, res, next){
+	const code = decodeURIComponent(req.query.code);
+	if (!code || typeof(code) == 'undefined' || code.length == 0)
+	  return res.status(500).send({status : "Service Error", message : "Authorization service did not send code"});
+	const info = {
+	  code : code
+	};
+
+	return bus.getMailToken(info, function(err, status, response){
+		res.render('index', {
+			isRedirectFromMail : true,
+			mailResponse: response
+		});
+	  bus.saveMailTokensToAuth(response);
+	  const info = {
+		status : status,
+		response : response
+	  };
+	  return;
+	});
+});

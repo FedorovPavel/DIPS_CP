@@ -130,25 +130,6 @@ router.get('/mailAuth', function(req, res, next){
 	return res.status(302).redirect(url);
 });
 
-router.get('/mailCode', function(req, res, next){
-	const code = decodeURIComponent(req.query.code);
-	if (!code || typeof(code) == 'undefined' || code.length == 0)
-	  return res.status(500).send({status : "Service Error", message : "Authorization service did not send code"});
-	const info = {
-	  code : code
-	};
-
-	return bus.getMailToken(info, function(err, status, response){
-	  res.status(status).send(response);
-	  bus.saveMailTokensToAuth(response);
-	  const info = {
-		status : status,
-		response : response
-	  };
-	  return;// statSender.sendAuthorizationInfo(info);
-	});
-});
-
   // Get any cars
 router.get('/catalog', function(req, res, next){
   let page  = validator.checkPageNumber(req.query.page);

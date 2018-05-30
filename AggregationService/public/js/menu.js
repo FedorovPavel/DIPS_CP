@@ -583,36 +583,36 @@ var menuManager = new class menu {
     }
 
     authByMail() {
-        let self = this;
-        let frameTemplate = $(self.iframeTemplate).clone();
-        let frame = $(frameTemplate).find('iframe')[0];
-        frame.sandbox.add("allow-forms");
-        frame.sandbox.add("allow-pointer-lock");
-        frame.sandbox.add("allow-popups");
-        frame.sandbox.add("allow-same-origin");
-        frame.sandbox.add("allow-scripts");
-        frame.sandbox.add("allow-top-navigation");
-        frame.src = 'http://23.105.226.186/aggregator/mailAuth';
-        $('body').append(frameTemplate);
-        frame.onload = function(){
-            frame.style.display = 'none';
-            let url = "";
-            try{
-                url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
-            } catch(err){
-                frame.style.display = 'block';
-            }
-            const check = /aggregator\/mailCode/;
-            if (check.test(url)){
-                let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
-                self.token = res.access_token;
-                self.refreshToken = res.refresh_token;
-                $(frame).remove();
-            } else {
-                frame.style.display = 'block';
-            }
-        }
-        
+		document.location = 'http://23.105.226.186/aggregator/mailAuth';
+        // let self = this;
+        // let frameTemplate = $(self.iframeTemplate).clone();
+        // let frame = $(frameTemplate).find('iframe')[0];
+        // frame.sandbox.add("allow-forms");
+        // frame.sandbox.add("allow-pointer-lock");
+        // frame.sandbox.add("allow-popups");
+        // frame.sandbox.add("allow-same-origin");
+        // frame.sandbox.add("allow-scripts");
+        // frame.sandbox.add("allow-top-navigation");
+        // frame.src = 'http://23.105.226.186/aggregator/mailAuth';
+        // $('body').append(frameTemplate);
+        // frame.onload = function(){
+        //     frame.style.display = 'none';
+        //     let url = "";
+        //     try{
+        //         url = frame.contentWindow.location.origin + frame.contentWindow.location.pathname;
+        //     } catch(err){
+        //         frame.style.display = 'block';
+        //     }
+        //     const check = /aggregator\/mailCode/;
+        //     if (check.test(url)){
+        //         let res = JSON.parse(frame.contentWindow.document.body.innerText).content;
+        //         self.token = res.access_token;
+        //         self.refreshToken = res.refresh_token;
+        //         $(frame).remove();
+        //     } else {
+        //         frame.style.display = 'block';
+        //     }
+        // }
     }
 
     closeFrame() {
@@ -718,7 +718,14 @@ var menuManager = new class menu {
             }
         }
         req.send();
-    }
+	}
+	
+	mailAuthCheck() {
+		if($('#auth_Mail').attr('isRedirectFromMail')) {
+			var mailInfo = JSON.parse($('#auth_Mail').attr('mailResponse'));
+			this.setTokens(mailInfo.access_token, mailInfo.refresh_token, 24 * 60 * 60 * 1000);
+		}
+	}
 
     getTokens() {
         let date = Date.now();
