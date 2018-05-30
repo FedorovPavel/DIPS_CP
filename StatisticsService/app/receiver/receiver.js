@@ -235,7 +235,7 @@ function validateOrder(info){
         return res += 'userId is undefined';
     if (!date.test(info.response.lease.from))
         return res += 'Invalid Start Date';
-    if (!date.test(info.response.Lease.to))
+    if (!date.test(info.response.lease.to))
         return res += 'Invalid End Date';
     if (info.response.Status != status)
         return res += 'Invalid order Status';
