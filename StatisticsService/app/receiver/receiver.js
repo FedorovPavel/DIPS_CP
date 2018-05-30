@@ -186,7 +186,7 @@ function ProccesedDraftOrderRecord(msg, callback){
                 messageId : id,
                 message : JSON.stringify(message)
             };
-            let state = validateOrder(message);
+            let state = validateOrder(message.response.content);
             if (!state){
                 response.state = "OK";
                 data.state = "OK";
@@ -224,20 +224,19 @@ function ProccesedDraftOrderRecord(msg, callback){
 };
 
 function validateOrder(info){
-    const date = /\d{4}-\d{2}-\d{2}/;
     const status = "Draft";
     let res = "";
     if (info.status != 201)
         res += 'Invalid message: ';
-    if (typeof(info.response.carId) == 'undefined')
+    if (typeof(info.carId) == 'undefined')
         return res += 'carId is undefined';
-    if (typeof(info.response.userId) == 'undefined')
+    if (typeof(info.userId) == 'undefined')
         return res += 'userId is undefined';
-    if (!date.test(info.response.lease.from))
+    if (!info.lease.from)
         return res += 'Invalid Start Date';
-    if (!date.test(info.response.lease.to))
+    if (!info.lease.to)
         return res += 'Invalid End Date';
-    if (info.response.Status != status)
+    if (info.status != status)
         return res += 'Invalid order Status';
     return null;
 }
