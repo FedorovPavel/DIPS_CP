@@ -176,13 +176,15 @@ var menuManager = new class menu {
             }
         });
         $(orders).click(function(){
-            if (self.openTabs != menuTab.orders) {
+            if (self.openTabs != menuTab.orders && self.checkAuth()) {
                 self.openTabs = menuTab.orders;
                 $(menuPills).find('li').removeClass('active');
                 $(this).addClass('active');
                 self.page = 0;      
                 self.changePager(); 
                 self.draftExecution = false;
+            } else if (!self.checkAuth()) {
+                alert('Авторизируйтесь пожалуйста');
             }
         });
         $(report).click(function(){
@@ -642,6 +644,19 @@ var menuManager = new class menu {
         }        
     }
 
+    visibleAuth(state) {
+        if (state) {
+            $('div#non-auth-field').addClass('hidden');
+            $('div#auth-field').removeClass('hidden');
+        } else {
+            $('div#non-auth-field').removeClass('hidden');
+            $('div#auth-field').addClass('hidden');
+            $('li#report-pill').addClass('hidden');
+            $('li#carmanager-pill').addClass('hidden');
+            $('li#automobile-pill').click();
+        }
+    }
+
     experidToken(){
         let self = this;
         clearTimeout(self.tokenTimer);
@@ -732,12 +747,15 @@ var menuManager = new class menu {
 
     getTokens() {
         let date = Date.now();
-        let created = Number(sessionStorage.getItem('created'));
-        let live = Number(sessionStorage.getItem('expires'));
-        // if (date - (created + live) < 0 ){
-            menuManager.token = sessionStorage.getItem('token');
-            menuManager.refreshToken = sessionStorage.getItem('refresh');
-        // }
+        menuManager.token = sessionStorage.getItem('token');
+        menuManager.refreshToken = sessionStorage.getItem('refresh');
+        if (menuManager.token != undefined && menuManager.refreshToken != undefined) {
+            isAdmin(function(result) {
+                if(result)
+                    unhideAdminPills();
+            });
+            menuManager.visibleAuth(true);
+        }
     }
 
     setTokens(token, refresh, expires) {
@@ -745,6 +763,18 @@ var menuManager = new class menu {
         sessionStorage.setItem('refresh', refresh);
         sessionStorage.setItem('expires', expires);
         sessionStorage.setItem('created', Date.now());
+        isAdmin(function(result) {
+            if(result)
+                unhideAdminPills();
+        });
+        menuManager.visibleAuth(true);
+    }
+
+    clearTokens() {
+        sessionStorage.clear();
+        menuManager.token = undefined;
+        menuManager.refreshToken = undefined;
+        menuManager.visibleAuth(false);
     }
 }();
 

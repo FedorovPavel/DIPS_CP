@@ -102,3 +102,14 @@ div.navbar-wrapper div.row.line button.reg-button {
   outline: none;
   color: #353535;
 }
+div.navbar-wrapper div.row.line .logout {
+  width: 100%;
+  padding: 2px;
+  text-align: center;
+  border-radius: 5px;
+  background: #3366FF;
+  cursor: pointer;
+}
+div.navbar-wrapper div.row.line .logout span {
+  color: #ffffff;
+}
