@@ -281,22 +281,23 @@ router.get('/orders', function(req, res, next){
             if (err){
               for (let I = 0; I < orders.content.orders.length; I++) {
                 delete orders.content.orders[I].carId;
-                orders.content.orders[I].Car = 'Неизвестно';
+                orders.content.orders[I].Car = 'Неизвестно';                
               }
-            }
-            let index;
-            let car;
-            carsIds = cars.map(function(val){
-              return val.id;
-            });
-            for (let I = 0; I < orders.content.orders.length; I++) {
-              index = carsIds.indexOf(orders.content.orders[I].carId);
-              if (index >= 0) {
-                orders.content.orders[I].Car = cars[index];
-              } else {
-                orders.content.orders[I].Car = 'Неизвестно';
+            } else {
+              let index;
+              let car;
+              carsIds = cars.map(function(val){
+                return val.id;
+              });
+              for (let I = 0; I < orders.content.orders.length; I++) {
+                index = carsIds.indexOf(orders.content.orders[I].carId);
+                if (index >= 0) {
+                  orders.content.orders[I].Car = cars[index];
+                } else {
+                  orders.content.orders[I].Car = 'Неизвестно';
+                }
+                delete orders.content.orders[I].carId;
               }
-              delete orders.content.orders[I].carId;
             }
             return res.status(200).send(orders);
           });
