@@ -23,7 +23,7 @@
     "jade": "^1.11.0",
     "livereload": "^0.6.3",
     "method-override": "^2.3.0",
-    "mongoose": "^4.13.7",
+    "mongoose": "^5.7.5",
     "morgan": "^1.6.1",
     "rabbitmq": "0.0.2",
     "redis": "^2.8.0",
